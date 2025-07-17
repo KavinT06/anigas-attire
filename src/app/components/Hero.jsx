@@ -40,7 +40,7 @@ export default function Hero() {
 
                                 <div className="w-px h-5 bg-black/20"></div>
 
-                                <a href="#" title="" className="text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80"> Log in </a>
+                                <a href="/login" title="" className="text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80"> Log in </a>
 
                                 <a href="#" title="" className="inline-flex items-center justify-center px-5 py-2.5 text-base font-semibold text-black border-2 border-black hover:bg-black hover:text-white transition-all duration-200 focus:bg-black focus:text-white" role="button"> Order on Whatsapp </a>
                             </div>
