@@ -30,9 +30,11 @@ export default function Hero() {
                             </button>
 
                             <div className="hidden ml-auto lg:flex lg:items-center lg:justify-center lg:space-x-10">
-                                <a href="#" title="" className="text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80"> Home </a>
+                                <a href="/" title="" className="text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80"> Home </a>
 
-                                <a href="#" title="" className="text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80"> Shop </a>
+                                <a href="/categories" title="" className="text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80"> Categories </a>
+
+                                <a href="/products" title="" className="text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80"> Products </a>
 
                                 <a href="#" title="" className="text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80"> About Us </a>
 
@@ -42,7 +44,7 @@ export default function Hero() {
 
                                 <a href="/login" title="" className="text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80"> Log in </a>
 
-                                <a href="#" title="" className="inline-flex items-center justify-center px-5 py-2.5 text-base font-semibold text-black border-2 border-black hover:bg-black hover:text-white transition-all duration-200 focus:bg-black focus:text-white" role="button"> Order on Whatsapp </a>
+                                <a href="/categories" title="" className="inline-flex items-center justify-center px-5 py-2.5 text-base font-semibold text-black border-2 border-black hover:bg-black hover:text-white transition-all duration-200 focus:bg-black focus:text-white" role="button"> Browse Categories </a>
                             </div>
                         </div>
                     </div>
@@ -63,7 +65,7 @@ export default function Hero() {
                                 <p className="mt-8 text-base text-black sm:text-xl">Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat.</p>
 
                                 <div className="mt-10 sm:flex sm:items-center sm:space-x-8">
-                                    <a href="#" title="" className="ml-10 xl:ml-0 inline-flex items-center justify-center px-10 py-4 text-base font-semibold text-white transition-all duration-200 bg-orange-500 hover:bg-orange-600 focus:bg-orange-600" role="button"> Shop now </a>
+                                    <a href="/products" title="" className="ml-10 xl:ml-0 inline-flex items-center justify-center px-10 py-4 text-base font-semibold text-white transition-all duration-200 bg-orange-500 hover:bg-orange-600 focus:bg-orange-600" role="button"> Shop now </a>
 
                                     {/* <a href="#" title="" className="inline-flex items-center mt-6 text-base font-semibold transition-all duration-200 sm:mt-0 hover:opacity-80">
                                         <svg className="w-10 h-10 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
