@@ -273,7 +273,7 @@ export default function ProductList() {
                                     )}
 
                                     {/* Product Info */}
-                                    <div className="relative border border-gray-100 bg-white p-4">
+                                    <div className="relative border border-gray-100 p-4" style={{ backgroundColor: '#f5f5f5' }}>
                                         {/* Category */}
                                         {product.category_name && !categoryId && (
                                             <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-orange-600 bg-orange-50 rounded-full mb-2">
