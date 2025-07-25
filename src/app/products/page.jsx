@@ -50,6 +50,10 @@ export default function ProductList() {
                     // If response has products array and category info
                     setProducts(response.data.products);
                     setCategoryName(response.data.category_name || '');
+                } else if (response.data.results) {
+                    // If response has paginated results
+                    setProducts(response.data.results);
+                    setCategoryName(response.data.category_name || '');
                 } else if (Array.isArray(response.data)) {
                     // If response is directly an array of products
                     setProducts(response.data);
