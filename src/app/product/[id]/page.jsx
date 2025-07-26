@@ -11,7 +11,10 @@ export default function ProductDetail({ params }) {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
     const router = useRouter();
-    const productId = params.id;
+    
+    // Unwrap params Promise using React.use()
+    const resolvedParams = React.use(params);
+    const productId = resolvedParams.id;
 
     // Configure your Django backend URL
     const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -27,7 +30,7 @@ export default function ProductDetail({ params }) {
             setIsLoading(true);
             setError('');
 
-            const response = await axios.get(`${API_BASE_URL}/api/products/${productId}/`, {
+            const response = await axios.get(`${API_BASE_URL}/api/ecom/products/${productId}/`, {
                 timeout: 10000,
                 headers: {
                     'Content-Type': 'application/json',
@@ -154,21 +157,45 @@ export default function ProductDetail({ params }) {
 
                     {product && (
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-                            {/* Product Image */}
-                            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-                                {product.image ? (
-                                    <Image
-                                        src={product.image}
-                                        alt={product.name}
-                                        width={600}
-                                        height={600}
-                                        className="object-cover w-full h-96 lg:h-full"
-                                    />
-                                ) : (
-                                    <div className="flex items-center justify-center h-96 lg:h-full bg-gradient-to-br from-gray-100 to-gray-200">
-                                        <svg className="w-24 h-24 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                        </svg>
+                            {/* Product Image Gallery */}
+                            <div className="space-y-4">
+                                {/* Main Image */}
+                                <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+                                    {product.images && product.images.length > 0 ? (
+                                        <Image
+                                            src={product.images[0].image_url}
+                                            alt={product.name}
+                                            width={600}
+                                            height={600}
+                                            className="object-contain w-full h-96 lg:h-[500px]"
+                                            priority
+                                        />
+                                    ) : (
+                                        <div className="flex items-center justify-center h-96 lg:h-[500px] bg-gradient-to-br from-gray-100 to-gray-200">
+                                            <div className="text-center">
+                                                <svg className="w-24 h-24 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                </svg>
+                                                <p className="text-lg text-gray-500">No Image Available</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                                
+                                {/* Thumbnail Images */}
+                                {product.images && product.images.length > 1 && (
+                                    <div className="grid grid-cols-4 gap-4">
+                                        {product.images.slice(0, 4).map((image, index) => (
+                                            <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow">
+                                                <Image
+                                                    src={image.image_url}
+                                                    alt={`${product.name} - Image ${index + 1}`}
+                                                    width={150}
+                                                    height={150}
+                                                    className="object-contain w-full h-20 lg:h-24"
+                                                />
+                                            </div>
+                                        ))}
                                     </div>
                                 )}
                             </div>

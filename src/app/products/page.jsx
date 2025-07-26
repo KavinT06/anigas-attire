@@ -236,7 +236,11 @@ export default function ProductList() {
                     {products.length > 0 ? (
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4">
                             {products.map((product) => (
-                                <div key={product.id} className="group relative block overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
+                                <div 
+                                    key={product.id} 
+                                    className="group relative block overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+                                    onClick={() => handleViewProduct(product.id)}
+                                >
                                     {/* Product Badges */}
                                     <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
                                         {product.is_new && (
@@ -356,7 +360,10 @@ export default function ProductList() {
                                                 Add to Cart
                                             </button>
                                             <button
-                                                onClick={() => handleViewProduct(product.id)}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleViewProduct(product.id);
+                                                }}
                                                 className="flex-1 rounded-sm bg-orange-500 px-3 py-2 text-sm font-medium text-white transition hover:scale-105 hover:bg-orange-600"
                                             >
                                                 Buy Now
