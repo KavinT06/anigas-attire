@@ -17,7 +17,7 @@ export default function ProductList() {
     const categoryId = searchParams.get('category');
 
     // Configure your Django backend URL
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5025';
 
     useEffect(() => {
         fetchProducts();
@@ -72,7 +72,7 @@ export default function ProductList() {
                     `Server error (${err.response.status})`;
                 setError(errorMessage);
             } else if (err.request) {
-                setError('Connection failed: Make sure Django server is running on http://localhost:8000');
+                setError('Connection failed: Make sure Django server is running on http://localhost:5025');
             } else {
                 setError(`Error: ${err.message}`);
             }

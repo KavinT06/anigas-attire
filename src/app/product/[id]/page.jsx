@@ -10,6 +10,8 @@ export default function ProductDetail({ params }) {
     const [product, setProduct] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
+    const [selectedSize, setSelectedSize] = useState('');
+    const [quantity, setQuantity] = useState(1);
     const router = useRouter();
     
     // Unwrap params Promise using React.use()
@@ -17,13 +19,58 @@ export default function ProductDetail({ params }) {
     const productId = resolvedParams.id;
 
     // Configure your Django backend URL
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5025';
+
+    // Get available sizes from product data or fallback to defaults
+    const getAvailableSizes = () => {
+        // Debug: Log the product data to see what we're working with
+        console.log('Product data for sizes:', product);
+        
+        // If backend provides sizes in product.variants array (most common case)
+        if (product?.variants && Array.isArray(product.variants) && product.variants.length > 0) {
+            const sizes = product.variants.map(variant => variant.name).filter(Boolean);
+            console.log('Extracted sizes from variants:', sizes);
+            return sizes;
+        }
+        
+        // If backend provides sizes in product.sizes array
+        if (product?.sizes && Array.isArray(product.sizes) && product.sizes.length > 0) {
+            console.log('Using product.sizes:', product.sizes);
+            return product.sizes;
+        }
+        
+        // If backend provides sizes in product.available_sizes
+        if (product?.available_sizes && Array.isArray(product.available_sizes) && product.available_sizes.length > 0) {
+            console.log('Using product.available_sizes:', product.available_sizes);
+            return product.available_sizes;
+        }
+        
+        // If backend provides sizes in product.variant_names
+        if (product?.variant_names && Array.isArray(product.variant_names) && product.variant_names.length > 0) {
+            console.log('Using product.variant_names:', product.variant_names);
+            return product.variant_names;
+        }
+        
+        console.log('Using fallback sizes - no size data found in backend');
+        // Fallback to include S-size in case backend doesn't provide size data
+        return ['S', 'M', 'L', 'XL', 'XXL'];
+    };
 
     useEffect(() => {
         if (productId) {
             fetchProduct();
         }
     }, [productId]);
+
+    // Set default size when product is loaded
+    useEffect(() => {
+        if (product && !selectedSize) {
+            const sizes = getAvailableSizes();
+            if (sizes.length > 0) {
+                setSelectedSize(sizes[0]);
+            }
+        }
+    }, [product, selectedSize]);
 
     const fetchProduct = async () => {
         try {
@@ -38,6 +85,8 @@ export default function ProductDetail({ params }) {
             });
 
             if (response.status === 200) {
+                console.log('Fetched product data:', response.data);
+                console.log('Product variants:', response.data.variants);
                 setProduct(response.data);
             } else {
                 setError('Failed to fetch product details');
@@ -51,7 +100,7 @@ export default function ProductDetail({ params }) {
                     `Server error (${err.response.status})`;
                 setError(errorMessage);
             } else if (err.request) {
-                setError('Connection failed: Make sure Django server is running on http://localhost:8000');
+                setError('Connection failed: Make sure Django server is running on http://localhost:5025');
             } else {
                 setError(`Error: ${err.message}`);
             }
@@ -99,7 +148,7 @@ export default function ProductDetail({ params }) {
     }
 
     return (
-        <div className="bg-gradient-to-b from-green-50 to-green-100 min-h-screen">
+        <div className="bg-white min-h-screen">
             {/* Header */}
             <header className="bg-white shadow-sm">
                 <div className="px-4 mx-auto sm:px-6 lg:px-8">
@@ -121,196 +170,165 @@ export default function ProductDetail({ params }) {
             </header>
 
             {/* Product Detail */}
-            <section className="py-12 sm:py-16 lg:py-20">
-                <div className="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl">
-                    {/* Breadcrumb */}
-                    <nav className="flex mb-8" aria-label="Breadcrumb">
-                        <ol className="inline-flex items-center space-x-1 md:space-x-3">
-                            <li className="inline-flex items-center">
-                                <a href="/" className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-orange-600">
-                                    <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
-                                    </svg>
-                                    Home
-                                </a>
-                            </li>
-                            <li>
-                                <div className="flex items-center">
-                                    <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd"></path>
-                                    </svg>
-                                    <a href="/products" className="ml-1 text-sm font-medium text-gray-700 hover:text-orange-600 md:ml-2">Products</a>
-                                </div>
-                            </li>
-                            <li aria-current="page">
-                                <div className="flex items-center">
-                                    <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd"></path>
-                                    </svg>
-                                    <span className="ml-1 text-sm font-medium text-gray-500 md:ml-2 truncate">
-                                        {product?.name || 'Product Details'}
-                                    </span>
-                                </div>
-                            </li>
-                        </ol>
-                    </nav>
-
-                    {product && (
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-                            {/* Product Image Gallery */}
-                            <div className="space-y-4">
-                                {/* Main Image */}
-                                <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-                                    {product.images && product.images.length > 0 ? (
-                                        <Image
-                                            src={product.images[0].image_url}
-                                            alt={product.name}
-                                            width={600}
-                                            height={600}
-                                            className="object-contain w-full h-96 lg:h-[500px]"
-                                            priority
-                                        />
-                                    ) : (
-                                        <div className="flex items-center justify-center h-96 lg:h-[500px] bg-gradient-to-br from-gray-100 to-gray-200">
-                                            <div className="text-center">
-                                                <svg className="w-24 h-24 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                </svg>
-                                                <p className="text-lg text-gray-500">No Image Available</p>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                                
-                                {/* Thumbnail Images */}
-                                {product.images && product.images.length > 1 && (
-                                    <div className="grid grid-cols-4 gap-4">
-                                        {product.images.slice(0, 4).map((image, index) => (
-                                            <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow">
-                                                <Image
-                                                    src={image.image_url}
-                                                    alt={`${product.name} - Image ${index + 1}`}
-                                                    width={150}
-                                                    height={150}
-                                                    className="object-contain w-full h-20 lg:h-24"
-                                                />
-                                            </div>
-                                        ))}
+            <div className="max-w-6xl mx-auto px-4 py-8">
+                {product && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                        {/* Product Image */}
+                        <div className="space-y-4">
+                            <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                                {product.images && product.images.length > 0 ? (
+                                    <Image
+                                        src={product.images[0].image_url}
+                                        alt={product.name}
+                                        width={500}
+                                        height={500}
+                                        className="w-full h-full object-cover"
+                                        priority
+                                    />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center">
+                                        <span className="text-gray-400 text-lg">No Image Available</span>
                                     </div>
                                 )}
                             </div>
+                        </div>
 
-                            {/* Product Info */}
-                            <div className="bg-white rounded-lg shadow-lg p-8">
-                                <div className="space-y-6">
-                                    {/* Product Title */}
-                                    <div>
-                                        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                                            {product.name}
-                                        </h1>
-                                        {product.category_name && (
-                                            <span className="inline-block px-3 py-1 text-sm font-medium text-orange-600 bg-orange-50 rounded-full">
-                                                {product.category_name}
-                                            </span>
-                                        )}
-                                    </div>
+                        {/* Product Info */}
+                        <div className="space-y-6">
+                            {/* Title and Category */}
+                            <div>
+                                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                                    {product.name}
+                                </h1>
+                                {product.category_name && (
+                                    <p className="text-gray-600 text-lg">
+                                        {product.category_name}
+                                    </p>
+                                )}
+                            </div>
 
-                                    {/* Rating */}
-                                    {product.rating && (
-                                        <div className="flex items-center space-x-2">
-                                            <div className="flex items-center">
-                                                {[...Array(5)].map((_, i) => (
-                                                    <svg
-                                                        key={i}
-                                                        className={`w-5 h-5 ${i < Math.floor(product.rating) ? 'text-yellow-400' : 'text-gray-300'}`}
-                                                        fill="currentColor"
-                                                        viewBox="0 0 20 20"
-                                                    >
-                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                    </svg>
-                                                ))}
-                                            </div>
-                                            <span className="text-sm text-gray-600">({product.rating})</span>
-                                        </div>
+                            {/* Price */}
+                            <div className="space-y-2">
+                                <div className="flex items-baseline space-x-4">
+                                    <span className="text-3xl font-bold text-gray-900">
+                                        {formatPrice(product.price)}
+                                    </span>
+                                    {product.original_price && product.original_price > product.price && (
+                                        <span className="text-xl text-gray-500 line-through">
+                                            {formatPrice(product.original_price)}
+                                        </span>
                                     )}
+                                </div>
+                                {product.original_price && product.original_price > product.price && (
+                                    <p className="text-green-600 font-medium">
+                                        Save {formatPrice(product.original_price - product.price)}
+                                    </p>
+                                )}
+                            </div>
 
-                                    {/* Price */}
-                                    <div className="space-y-2">
-                                        <div className="flex items-center space-x-3">
-                                            <span className="text-3xl font-bold text-gray-900">
-                                                {formatPrice(product.price)}
-                                            </span>
-                                            {product.original_price && product.original_price > product.price && (
-                                                <span className="text-lg text-gray-500 line-through">
-                                                    {formatPrice(product.original_price)}
-                                                </span>
-                                            )}
-                                        </div>
-                                        {product.original_price && product.original_price > product.price && (
-                                            <div className="text-sm text-green-600 font-medium">
-                                                Save {formatPrice(product.original_price - product.price)}
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Description */}
-                                    {product.description && (
-                                        <div>
-                                            <h3 className="text-lg font-semibold text-gray-900 mb-2">Description</h3>
-                                            <p className="text-gray-600 leading-relaxed">
-                                                {product.description}
-                                            </p>
-                                        </div>
-                                    )}
-
-                                    {/* Product Details */}
-                                    <div className="border-t border-gray-200 pt-6">
-                                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Product Details</h3>
-                                        <dl className="space-y-3">
-                                            {product.sku && (
-                                                <div className="flex justify-between">
-                                                    <dt className="text-sm font-medium text-gray-600">SKU</dt>
-                                                    <dd className="text-sm text-gray-900">{product.sku}</dd>
-                                                </div>
-                                            )}
-                                            {product.brand && (
-                                                <div className="flex justify-between">
-                                                    <dt className="text-sm font-medium text-gray-600">Brand</dt>
-                                                    <dd className="text-sm text-gray-900">{product.brand}</dd>
-                                                </div>
-                                            )}
-                                            {product.availability && (
-                                                <div className="flex justify-between">
-                                                    <dt className="text-sm font-medium text-gray-600">Availability</dt>
-                                                    <dd className="text-sm text-gray-900">{product.availability}</dd>
-                                                </div>
-                                            )}
-                                        </dl>
-                                    </div>
-
-                                    {/* Action Buttons */}
-                                    <div className="space-y-4 pt-6">
-                                        <button className="w-full inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white transition-all duration-200 bg-orange-500 hover:bg-orange-600 focus:bg-orange-600 rounded-lg shadow-lg">
-                                            Add to Cart
-                                        </button>
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <button 
-                                                onClick={() => router.push('/products')}
-                                                className="inline-flex items-center justify-center px-6 py-2 text-sm font-medium text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                            {/* Rating */}
+                            {product.rating && (
+                                <div className="flex items-center space-x-2">
+                                    <div className="flex items-center">
+                                        {[...Array(5)].map((_, i) => (
+                                            <svg
+                                                key={i}
+                                                className={`w-5 h-5 ${i < Math.floor(product.rating) ? 'text-yellow-400' : 'text-gray-300'}`}
+                                                fill="currentColor"
+                                                viewBox="0 0 20 20"
                                             >
-                                                Back to Products
-                                            </button>
-                                            <button className="inline-flex items-center justify-center px-6 py-2 text-sm font-medium text-orange-600 transition-all duration-200 bg-orange-50 border border-orange-200 rounded-md hover:bg-orange-100">
-                                                Add to Wishlist
-                                            </button>
-                                        </div>
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                            </svg>
+                                        ))}
                                     </div>
+                                    <span className="text-gray-600">({product.rating})</span>
+                                </div>
+                            )}
+
+                            {/* Size Selection */}
+                            <div className="space-y-3">
+                                <h3 className="text-lg font-semibold text-gray-900">
+                                    Size: {selectedSize && <span className="text-orange-600">{selectedSize}</span>}
+                                </h3>
+                                <div className="flex flex-wrap gap-3">
+                                    {getAvailableSizes().map((size) => (
+                                        <button
+                                            key={size}
+                                            onClick={() => setSelectedSize(size)}
+                                            className={`px-6 py-3 text-sm font-medium border-2 rounded-lg transition-all duration-200 ${
+                                                selectedSize === size
+                                                    ? 'border-orange-500 bg-orange-500 text-white'
+                                                    : 'border-gray-300 bg-white text-gray-700 hover:border-orange-300'
+                                            }`}
+                                        >
+                                            {size}
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
+
+                            {/* Quantity */}
+                            <div className="space-y-3">
+                                <h3 className="text-lg font-semibold text-gray-900">Quantity</h3>
+                                <div className="flex items-center space-x-4">
+                                    <button
+                                        onClick={() => quantity > 1 && setQuantity(quantity - 1)}
+                                        className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-lg hover:bg-gray-50"
+                                        disabled={quantity <= 1}
+                                    >
+                                        -
+                                    </button>
+                                    <span className="w-16 text-center text-lg font-medium">{quantity}</span>
+                                    <button
+                                        onClick={() => setQuantity(quantity + 1)}
+                                        className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-lg hover:bg-gray-50"
+                                    >
+                                        +
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Add to Cart Button */}
+                            <div className="space-y-4 pt-4">
+                                <button 
+                                    className="w-full bg-orange-500 text-white py-4 px-6 rounded-lg font-semibold text-lg hover:bg-orange-600 transition-colors duration-200"
+                                    onClick={() => {
+                                        console.log('Adding to cart:', {
+                                            productId: product.id,
+                                            size: selectedSize,
+                                            quantity
+                                        });
+                                    }}
+                                >
+                                    Add to Cart
+                                </button>
+                                
+                                <div className="flex space-x-4">
+                                    <button 
+                                        onClick={() => router.push('/products')}
+                                        className="flex-1 border border-gray-300 text-gray-700 py-3 px-6 rounded-lg font-medium hover:bg-gray-50 transition-colors duration-200"
+                                    >
+                                        Back to Products
+                                    </button>
+                                    <button className="flex-1 border border-orange-300 text-orange-600 py-3 px-6 rounded-lg font-medium hover:bg-orange-50 transition-colors duration-200">
+                                        Add to Wishlist
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Description */}
+                            {product.description && (
+                                <div className="pt-6 border-t">
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Description</h3>
+                                    <p className="text-gray-600 leading-relaxed">
+                                        {product.description}
+                                    </p>
+                                </div>
+                            )}
                         </div>
-                    )}
-                </div>
-            </section>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
