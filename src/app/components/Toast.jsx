@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-const Toast = ({ message, type = 'success', duration = 3000, onClose }) => {
+const Toast = ({ message, type = 'success', duration = 1000, onClose }) => {
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
@@ -13,7 +13,7 @@ const Toast = ({ message, type = 'success', duration = 3000, onClose }) => {
   }, [duration, onClose]);
 
   const getToastStyles = () => {
-    const baseStyles = "fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg flex items-center space-x-3 transform transition-all duration-300";
+    const baseStyles = "relative p-4 rounded-lg shadow-lg flex items-center space-x-3 transform transition-all duration-300 min-w-80";
     
     if (!isVisible) {
       return `${baseStyles} translate-x-full opacity-0`;
@@ -97,7 +97,7 @@ const ToastContainer = ({ toasts, removeToast }) => {
 export const useToast = () => {
   const [toasts, setToasts] = useState([]);
 
-  const addToast = (message, type = 'success', duration = 3000) => {
+  const addToast = (message, type = 'success', duration = 1000) => {
     const id = Date.now() + Math.random();
     const newToast = { id, message, type, duration };
     
@@ -109,10 +109,10 @@ export const useToast = () => {
   };
 
   const toast = {
-    success: (message, duration) => addToast(message, 'success', duration),
-    error: (message, duration) => addToast(message, 'error', duration),
-    warning: (message, duration) => addToast(message, 'warning', duration),
-    info: (message, duration) => addToast(message, 'info', duration),
+    success: (message, options = {}) => addToast(message, 'success', options.duration || 1000),
+    error: (message, options = {}) => addToast(message, 'error', options.duration || 1000),
+    warning: (message, options = {}) => addToast(message, 'warning', options.duration || 1000),
+    info: (message, options = {}) => addToast(message, 'info', options.duration || 1000),
   };
 
   return { toasts, removeToast, toast };

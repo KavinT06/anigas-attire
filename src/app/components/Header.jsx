@@ -71,27 +71,11 @@ const Header = () => {
               Products
             </Link>
             <Link 
-              href="/about" 
-              className="text-base font-semibold text-black transition-all duration-200 hover:text-orange-600"
-            >
-              About
-            </Link>
-            <Link 
-              href="/contact" 
-              className="text-base font-semibold text-black transition-all duration-200 hover:text-orange-600"
-            >
-              Contact
-            </Link>
-          </div>
-
-          {/* Cart Icon */}
-          <div className="flex items-center space-x-4">
-            <Link 
               href="/cart" 
-              className="relative p-2 text-gray-600 hover:text-orange-600 transition-colors duration-200"
+              className="relative text-base font-semibold text-black transition-all duration-200 hover:text-orange-600 flex items-center space-x-1"
             >
               <svg 
-                className="w-6 h-6" 
+                className="w-4 h-4" 
                 fill="none" 
                 stroke="currentColor" 
                 viewBox="0 0 24 24"
@@ -100,15 +84,19 @@ const Header = () => {
                   strokeLinecap="round" 
                   strokeLinejoin="round" 
                   strokeWidth="2" 
-                  d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 9.5M7 13h10M7 13v8a2 2 0 002 2h6a2 2 0 002-2v-8M7 13H5.4M7 13l10 0" 
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 9.5M7 13h10" 
                 />
               </svg>
+              <span>Cart</span>
               {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                <span className="absolute -top-2 -right-3 bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
                   {totalItems > 99 ? '99+' : totalItems}
                 </span>
               )}
             </Link>
+          </div>
+
+          <div className="flex items-center space-x-4">
 
             {/* Mobile menu button */}
             <button 

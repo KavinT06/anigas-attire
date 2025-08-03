@@ -233,13 +233,12 @@ const CartPage = () => {
               </div>
 
               <div className="mt-6">
-                <button
-                  type="button"
-                  className="w-full bg-orange-500 border border-transparent rounded-md py-3 px-4 text-base font-medium text-white hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors duration-200"
-                  onClick={() => toast.info('Checkout functionality coming soon!')}
+                <Link
+                  href="/checkout"
+                  className="block w-full bg-orange-500 border border-transparent rounded-md py-3 px-4 text-base font-medium text-white hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors duration-200 text-center"
                 >
                   Proceed to Checkout
-                </button>
+                </Link>
               </div>
 
               <div className="mt-4 text-center">
