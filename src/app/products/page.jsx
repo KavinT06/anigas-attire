@@ -4,6 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import Image from 'next/image';
+import useCartStore from '../../store/cartStore';
+import Header from '../components/Header';
+import ToastContainer, { useToast } from '../components/Toast';
 import logo from "../../assets/logo.jpg";
 
 export default function ProductList() {
@@ -12,9 +15,14 @@ export default function ProductList() {
     const [error, setError] = useState('');
     const [categoryName, setCategoryName] = useState('');
     const [expandedDescriptions, setExpandedDescriptions] = useState(new Set());
+    const [wishlist, setWishlist] = useState([]);
     const router = useRouter();
     const searchParams = useSearchParams();
     const categoryId = searchParams.get('category');
+
+    // Use cart store and toast
+    const { addToCart } = useCartStore();
+    const { toasts, removeToast, toast } = useToast();
 
     // Configure your Django backend URL
     const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5025';
@@ -22,6 +30,14 @@ export default function ProductList() {
     useEffect(() => {
         fetchProducts();
     }, [categoryId]);
+
+    // Load wishlist from localStorage
+    useEffect(() => {
+        const savedWishlist = localStorage.getItem('wishlist');
+        if (savedWishlist) {
+            setWishlist(JSON.parse(savedWishlist));
+        }
+    }, []);
 
     const fetchProducts = async () => {
         try {
@@ -86,6 +102,50 @@ export default function ProductList() {
         router.push(`/product/${productId}`);
     };
 
+    const handleAddToCart = (product, e) => {
+        e.stopPropagation();
+        
+        // For products page, we'll add with a default medium size
+        const defaultSize = 'M';
+        
+        addToCart(product, defaultSize, 1);
+        
+        toast.success(`Added ${product.name} to cart!`);
+        
+        // Dispatch custom event to update header cart count
+        window.dispatchEvent(new Event('cartUpdated'));
+    };
+
+    // Check if product is in wishlist
+    const isInWishlist = (productId) => {
+        return wishlist.some(item => item.id === productId);
+    };
+
+    // Add/remove from wishlist
+    const toggleWishlist = (product, e) => {
+        e.stopPropagation();
+        
+        let updatedWishlist;
+        if (isInWishlist(product.id)) {
+            // Remove from wishlist
+            updatedWishlist = wishlist.filter(item => item.id !== product.id);
+            toast.success('Removed from wishlist');
+        } else {
+            // Add to wishlist
+            updatedWishlist = [...wishlist, {
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                image: product.images?.[0]?.image_url,
+                category_name: product.category_name
+            }];
+            toast.success('Added to wishlist');
+        }
+        
+        setWishlist(updatedWishlist);
+        localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
+    };
+
     const toggleDescription = (productId) => {
         setExpandedDescriptions(prev => {
             const newSet = new Set(prev);
@@ -114,10 +174,14 @@ export default function ProductList() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Loading products...</p>
+            <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100">
+                <Header />
+                <ToastContainer toasts={toasts} removeToast={removeToast} />
+                <div className="flex items-center justify-center py-20">
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
+                        <p className="mt-4 text-gray-600">Loading products...</p>
+                    </div>
                 </div>
             </div>
         );
@@ -125,25 +189,8 @@ export default function ProductList() {
 
     return (
         <div className="bg-gradient-to-b from-green-50 to-green-100 min-h-screen">
-            {/* Header */}
-            <header className="bg-white shadow-sm">
-                <div className="px-4 mx-auto sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between h-16 lg:h-20">
-                        <div className="flex-shrink-0 inline-flex">
-                            <a href="/" title="" className="flex">
-                                <Image className="w-auto h-7 xl:h-10 xl:ml-28 rounded-lg" src={logo} alt="Aniga's Attire Logo" />
-                            </a>
-                            <p className='text-xl ml-1.5 mt-0.5 font-bold text-black'>Aniga's Attire</p>
-                        </div>
-                        <div className="hidden ml-auto lg:flex lg:items-center lg:justify-center lg:space-x-10">
-                            <a href="/" title="" className="text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80">Home</a>
-                            <a href="/categories" title="" className="text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80">Categories</a>
-                            <a href="/products" title="" className="text-base font-semibold text-orange-500 transition-all duration-200 hover:text-opacity-80">All Products</a>
-                            <a href="/login" title="" className="text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80">Log in</a>
-                        </div>
-                    </div>
-                </div>
-            </header>
+            <Header />
+            <ToastContainer toasts={toasts} removeToast={removeToast} />
 
             {/* Main Content */}
             <section className="py-12 sm:py-16 lg:py-20">
@@ -351,22 +398,34 @@ export default function ProductList() {
                                         {/* Action Buttons */}
                                         <div className="flex gap-2">
                                             <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    // Add to cart functionality
-                                                }}
-                                                className="flex-1 rounded-sm bg-orange-100 px-3 py-2 text-sm font-medium text-orange-900 transition hover:scale-105 hover:bg-orange-200"
+                                                onClick={(e) => handleAddToCart(product, e)}
+                                                className="flex-1 rounded-sm bg-gray-900 px-3 py-2 text-sm font-medium text-white transition hover:scale-105 hover:bg-gray-800"
                                             >
                                                 Add to Cart
                                             </button>
                                             <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleViewProduct(product.id);
-                                                }}
-                                                className="flex-1 rounded-sm bg-orange-500 px-3 py-2 text-sm font-medium text-white transition hover:scale-105 hover:bg-orange-600"
+                                                onClick={(e) => toggleWishlist(product, e)}
+                                                className={`flex-1 rounded-sm px-3 py-2 text-sm font-medium transition hover:scale-105 ${
+                                                    isInWishlist(product.id)
+                                                        ? 'bg-pink-100 text-pink-600 hover:bg-pink-200'
+                                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                                }`}
                                             >
-                                                Buy Now
+                                                {isInWishlist(product.id) ? (
+                                                    <span className="flex items-center gap-2">
+                                                        <svg className="w-5 h-5 text-red-500 fill-current" viewBox="0 0 24 24">
+                                                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                                        </svg>
+                                                        In Wishlist
+                                                    </span>
+                                                ) : (
+                                                    <span className="flex items-center gap-2">
+                                                        <svg className="w-5 h-5 text-gray-400 fill-current" viewBox="0 0 24 24">
+                                                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                                        </svg>
+                                                        Add to Wishlist
+                                                    </span>
+                                                )}
                                             </button>
                                         </div>
                                     </div>

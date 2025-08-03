@@ -4,7 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import Image from 'next/image';
-import logo from "../../../assets/logo.jpg";
+import useCartStore from '../../../store/cartStore';
+import toast, { Toaster } from 'react-hot-toast';
+import Header from '../../components/Header';
 
 export default function ProductDetail({ params }) {
     const [product, setProduct] = useState(null);
@@ -12,7 +14,12 @@ export default function ProductDetail({ params }) {
     const [error, setError] = useState('');
     const [selectedSize, setSelectedSize] = useState('');
     const [quantity, setQuantity] = useState(1);
+    const [isAddingToCart, setIsAddingToCart] = useState(false);
+    const [wishlist, setWishlist] = useState([]);
     const router = useRouter();
+    
+    // Use cart store
+    const { addToCart } = useCartStore();
     
     // Unwrap params Promise using React.use()
     const resolvedParams = React.use(params);
@@ -71,6 +78,92 @@ export default function ProductDetail({ params }) {
             }
         }
     }, [product, selectedSize]);
+
+    // Load wishlist from localStorage
+    useEffect(() => {
+        const savedWishlist = localStorage.getItem('wishlist');
+        if (savedWishlist) {
+            setWishlist(JSON.parse(savedWishlist));
+        }
+    }, []);
+
+    // Check if product is in wishlist
+    const isInWishlist = () => {
+        return wishlist.some(item => item.id === product?.id);
+    };
+
+    // Add/remove from wishlist
+    const toggleWishlist = () => {
+        if (!product) return;
+
+        let updatedWishlist;
+        if (isInWishlist()) {
+            // Remove from wishlist
+            updatedWishlist = wishlist.filter(item => item.id !== product.id);
+            toast.success('Removed from wishlist', {
+                icon: '💔',
+                duration: 2000,
+            });
+        } else {
+            // Add to wishlist
+            updatedWishlist = [...wishlist, {
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                image: product.images?.[0]?.image_url,
+                category_name: product.category_name
+            }];
+            toast.success('Added to wishlist', {
+                icon: '❤️',
+                duration: 2000,
+            });
+        }
+        
+        setWishlist(updatedWishlist);
+        localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
+    };
+
+    // Handle add to cart
+    const handleAddToCart = async () => {
+        if (!product) {
+            toast.error('Product not found');
+            return;
+        }
+
+        if (!selectedSize) {
+            toast.error('Please select a size');
+            return;
+        }
+
+        setIsAddingToCart(true);
+        
+        try {
+            // Use the cart store to add item
+            addToCart(product, selectedSize, quantity);
+            
+            // Trigger storage event for header to update
+            window.dispatchEvent(new Event('cartUpdated'));
+            
+            toast.success(
+                `Added ${quantity} ${product.name} (${selectedSize}) to cart!`,
+                {
+                    duration: 3000,
+                    position: 'top-center',
+                    icon: '🛒',
+                    style: {
+                        background: '#22c55e',
+                        color: 'white',
+                    },
+                }
+            );
+            
+        } catch (error) {
+            console.error('Error adding to cart:', error);
+            toast.error('Failed to add to cart. Please try again.');
+        } finally {
+            setIsAddingToCart(false);
+        }
+    };
 
     const fetchProduct = async () => {
         try {
@@ -149,25 +242,9 @@ export default function ProductDetail({ params }) {
 
     return (
         <div className="bg-white min-h-screen">
+            <Toaster />
             {/* Header */}
-            <header className="bg-white shadow-sm">
-                <div className="px-4 mx-auto sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between h-16 lg:h-20">
-                        <div className="flex-shrink-0 inline-flex">
-                            <a href="/" title="" className="flex">
-                                <Image className="w-auto h-7 xl:h-10 xl:ml-28 rounded-lg" src={logo} alt="Aniga's Attire Logo" />
-                            </a>
-                            <p className='text-xl ml-1.5 mt-0.5 font-bold text-black'>Aniga's Attire</p>
-                        </div>
-                        <div className="hidden ml-auto lg:flex lg:items-center lg:justify-center lg:space-x-10">
-                            <a href="/" title="" className="text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80">Home</a>
-                            <a href="/categories" title="" className="text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80">Categories</a>
-                            <a href="/products" title="" className="text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80">Products</a>
-                            <a href="/login" title="" className="text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80">Log in</a>
-                        </div>
-                    </div>
-                </div>
-            </header>
+            <Header />
 
             {/* Product Detail */}
             <div className="max-w-6xl mx-auto px-4 py-8">
@@ -291,16 +368,25 @@ export default function ProductDetail({ params }) {
                             {/* Add to Cart Button */}
                             <div className="space-y-4 pt-4">
                                 <button 
-                                    className="w-full bg-orange-500 text-white py-4 px-6 rounded-lg font-semibold text-lg hover:bg-orange-600 transition-colors duration-200"
-                                    onClick={() => {
-                                        console.log('Adding to cart:', {
-                                            productId: product.id,
-                                            size: selectedSize,
-                                            quantity
-                                        });
-                                    }}
+                                    className={`w-full py-4 px-6 rounded-lg font-semibold text-lg transition-colors duration-200 ${
+                                        isAddingToCart 
+                                            ? 'bg-gray-400 text-white cursor-not-allowed' 
+                                            : 'bg-gray-900 text-white hover:bg-gray-800'
+                                    }`}
+                                    onClick={handleAddToCart}
+                                    disabled={isAddingToCart || !selectedSize}
                                 >
-                                    Add to Cart
+                                    {isAddingToCart ? (
+                                        <span className="flex items-center justify-center">
+                                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                            Adding to Cart...
+                                        </span>
+                                    ) : (
+                                        'Add to Cart'
+                                    )}
                                 </button>
                                 
                                 <div className="flex space-x-4">
@@ -310,8 +396,29 @@ export default function ProductDetail({ params }) {
                                     >
                                         Back to Products
                                     </button>
-                                    <button className="flex-1 border border-orange-300 text-orange-600 py-3 px-6 rounded-lg font-medium hover:bg-orange-50 transition-colors duration-200">
-                                        Add to Wishlist
+                                    <button 
+                                        onClick={toggleWishlist}
+                                        className={`flex-1 py-3 px-6 rounded-lg font-medium transition-colors duration-200 ${
+                                            isInWishlist()
+                                                ? 'border border-pink-300 text-pink-600 bg-pink-50 hover:bg-pink-100'
+                                                : 'border border-gray-200 text-gray-600 bg-gray-50 hover:bg-gray-100'
+                                        }`}
+                                    >
+                                        {isInWishlist() ? (
+                                            <span className="flex items-center gap-2">
+                                                <svg className="w-5 h-5 text-red-500 fill-current" viewBox="0 0 24 24">
+                                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                                </svg>
+                                                In Wishlist
+                                            </span>
+                                        ) : (
+                                            <span className="flex items-center gap-2">
+                                                <svg className="w-5 h-5 text-gray-400 fill-current" viewBox="0 0 24 24">
+                                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                                </svg>
+                                                Add to Wishlist
+                                            </span>
+                                        )}
                                     </button>
                                 </div>
                             </div>
