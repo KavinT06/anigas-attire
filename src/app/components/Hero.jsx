@@ -36,10 +36,6 @@ export default function Hero() {
 
                                 <a href="/products" title="" className="text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80"> Products </a>
 
-                                <a href="#" title="" className="text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80"> About Us </a>
-
-                                <a href="#" title="" className="text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80"> Contact Us </a>
-
                                 <div className="w-px h-5 bg-black/20"></div>
 
                                 <a href="/login" title="" className="text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80"> Log in </a>
