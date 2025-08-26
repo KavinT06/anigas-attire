@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
-import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 import { PhoneIcon } from "@heroicons/react/24/outline";
 import ReCAPTCHA from "react-google-recaptcha";
 import Cookie from "js-cookie";
@@ -21,15 +20,7 @@ const Login = () => {
   // Backend API URL
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5025";
 
-  const [recaptchaLoaded, setRecaptchaLoaded] = useState(false);
-
-  const onRecaptchaLoad = () => {
-    console.log('🔒 reCAPTCHA loaded successfully');
-    setRecaptchaLoaded(true);
-  };
-
   const onRecaptchaError = () => {
-    console.error('❌ reCAPTCHA failed to load');
     setErrorMessage("reCAPTCHA failed to load. Please refresh the page.");
   };
 
@@ -41,10 +32,8 @@ const Login = () => {
 
   const getValidToken = async () => {
     try {
-      console.log('🔒 Executing reCAPTCHA...');
-      
       const timeoutPromise = new Promise((resolve, reject) => {
-        setTimeout(() => reject(new Error("reCAPTCHA timeout")), 30000); // 10 seconds timeout
+        setTimeout(() => reject(new Error("reCAPTCHA timeout")), 10000);
       });
       
       if (!recaptchaRef.current) {
@@ -53,8 +42,6 @@ const Login = () => {
       
       const tokenPromise = recaptchaRef.current.executeAsync();
       const token = await Promise.race([tokenPromise, timeoutPromise]);
-
-      console.log('🔒 reCAPTCHA token received:', token ? 'Token generated successfully' : 'No token received');
       
       if (!token) {
         throw new Error("reCAPTCHA failed - no token received.");
@@ -63,10 +50,7 @@ const Login = () => {
       setCaptchaToken(token);
       return token;
     } catch (error) {
-      console.error("❌ reCAPTCHA execution failed:", error);
-      setErrorMessage(
-        "Captcha verification failed or timed out. Please try again."
-      );
+      setErrorMessage("Captcha verification failed or timed out. Please try again.");
       setLoading(false);
       return null;
     }
@@ -95,7 +79,6 @@ const Login = () => {
         setLoading(false);
       }
     } catch (error) {
-      console.error("❌ Error during mobile submission:", error);
       setErrorMessage("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
@@ -106,16 +89,10 @@ const Login = () => {
     try {
       const phone_number = mobile;
       
-      console.log(`📱 Sending OTP request to: ${API_BASE_URL}/api/auth/send-otp/`);
-      console.log(`📱 Phone number: ${phone_number}`);
-      console.log(`🔒 reCAPTCHA token length: ${token ? token.length : 0}`);
-      
       const requestBody = {
         phone_number,
         recaptcha_token: token,
       };
-      
-      console.log('📤 Request payload:', JSON.stringify(requestBody, null, 2));
       
       const response = await fetch(`${API_BASE_URL}/api/auth/send-otp/`, {
         method: "POST",
@@ -124,16 +101,12 @@ const Login = () => {
         },
         body: JSON.stringify(requestBody),
       });
-
-      console.log(`📥 Response status: ${response.status}`);
       
       if (response.ok) {
         const data = await response.json();
-        console.log('✅ OTP sent successfully:', data);
         setStep(2);
       } else {
         const errorData = await response.json();
-        console.log('❌ OTP send failed:', response.status, errorData);
         
         // Handle specific error messages from your backend
         if (errorData.recaptcha_token && Array.isArray(errorData.recaptcha_token)) {
@@ -149,7 +122,6 @@ const Login = () => {
         }
       }
     } catch (error) {
-      console.error("❌ Network error sending OTP:", error);
       setErrorMessage("Failed to connect to backend. Please check if backend is running on " + API_BASE_URL);
     } finally {
       setLoading(false);
@@ -188,7 +160,6 @@ const Login = () => {
         setErrorMessage("Captcha verification failed. Please try again.");
       }
     } catch (error) {
-      console.error("Error during OTP submission process:", error);
       setErrorMessage("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
@@ -205,8 +176,6 @@ const Login = () => {
         setLoading(false);
         return;
       }
-
-      console.log(`Verifying OTP at: ${API_BASE_URL}/api/auth/login/`);
       
       const response = await fetch(`${API_BASE_URL}/api/auth/login/`, {
         method: "POST",
@@ -222,7 +191,6 @@ const Login = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('✅ Login successful:', data);
         
         // Handle different response formats from your backend
         if (data.access || data.access_token || data.token) {
@@ -238,11 +206,9 @@ const Login = () => {
         window.location.href = "/";
       } else {
         const errorData = await response.json();
-        console.log('❌ Login failed:', response.status, errorData);
         setErrorMessage(errorData.detail || errorData.message || errorData.error || "Invalid OTP. Please try again.");
       }
     } catch (error) {
-      console.error("Error during OTP verification:", error);
       setErrorMessage("Failed to connect to backend. Please try again.");
     } finally {
       setLoading(false);
@@ -261,7 +227,6 @@ const Login = () => {
           sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "6Ldv-zMqAAAAAHvipf7LMgO92j_KK3mUm6xfvRdE"}
           size="invisible"
           onChange={setCaptchaToken}
-          onLoad={onRecaptchaLoad}
           onError={onRecaptchaError}
         />
 
