@@ -110,7 +110,7 @@ export default function ProductDetail({ params }) {
             updatedWishlist = [...wishlist, {
                 id: product.id,
                 name: product.name,
-                price: product.price,
+                price: product.start_price,
                 image: product.images?.[0]?.image_url,
                 category_name: product.category_name
             }];
@@ -177,8 +177,6 @@ export default function ProductDetail({ params }) {
             });
 
             if (response.status === 200) {
-                console.log('Fetched product data:', response.data);
-                console.log('Product variants:', response.data.variants);
                 setProduct(response.data);
             } else {
                 setError('Failed to fetch product details');
@@ -202,10 +200,17 @@ export default function ProductDetail({ params }) {
     };
 
     const formatPrice = (price) => {
-        if (typeof price === 'number') {
-            return `$${price.toFixed(2)}`;
+        if (price === null || price === undefined || price === '') {
+            return 'Price not available';
         }
-        return price || 'Price not available';
+        
+        const numPrice = typeof price === 'string' ? parseFloat(price) : price;
+        
+        if (typeof numPrice === 'number' && !isNaN(numPrice)) {
+            return `₹${numPrice.toFixed(2)}`;
+        }
+        
+        return 'Price not available';
     };
 
     if (isLoading) {
@@ -287,17 +292,17 @@ export default function ProductDetail({ params }) {
                             <div className="space-y-2">
                                 <div className="flex items-baseline space-x-4">
                                     <span className="text-3xl font-bold text-gray-900">
-                                        {formatPrice(product.price)}
+                                        {formatPrice(product.start_price)}
                                     </span>
-                                    {product.original_price && product.original_price > product.price && (
+                                    {product.end_price && product.end_price > product.start_price && (
                                         <span className="text-xl text-gray-500 line-through">
-                                            {formatPrice(product.original_price)}
+                                            {formatPrice(product.end_price)}
                                         </span>
                                     )}
                                 </div>
-                                {product.original_price && product.original_price > product.price && (
+                                {product.end_price && product.end_price > product.start_price && (
                                     <p className="text-green-600 font-medium">
-                                        Save {formatPrice(product.original_price - product.price)}
+                                        Save {formatPrice(product.end_price - product.start_price)}
                                     </p>
                                 )}
                             </div>

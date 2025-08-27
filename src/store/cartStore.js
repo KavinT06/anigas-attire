@@ -23,7 +23,7 @@ const useCartStore = create(
               id: itemId,
               productId: product.id,
               name: product.name,
-              price: parseFloat(product.price) || 0,
+              price: parseFloat(product.start_price) || 0,
               image: product.images && product.images.length > 0 
                 ? product.images[0].image_url 
                 : null,

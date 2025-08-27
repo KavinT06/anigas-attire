@@ -18,7 +18,7 @@ const CartPage = () => {
   const { toasts, removeToast, toast } = useToast();
 
   const formatPrice = (price) => {
-    return `$${price.toFixed(2)}`;
+    return `₹${price.toFixed(2)}`;
   };
 
   const handleQuantityChange = (productId, size, newQuantity) => {

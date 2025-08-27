@@ -134,7 +134,7 @@ export default function ProductList() {
             updatedWishlist = [...wishlist, {
                 id: product.id,
                 name: product.name,
-                price: product.price,
+                price: product.start_price,
                 image: product.images?.[0]?.image_url,
                 category_name: product.category_name
             }];
@@ -165,10 +165,17 @@ export default function ProductList() {
     };
 
     const formatPrice = (price) => {
-        if (typeof price === 'number') {
-            return `$${price.toFixed(2)}`;
+        if (price === null || price === undefined || price === '') {
+            return 'Price not available';
         }
-        return price || 'Price not available';
+        
+        const numPrice = typeof price === 'string' ? parseFloat(price) : price;
+        
+        if (typeof numPrice === 'number' && !isNaN(numPrice)) {
+            return `₹${numPrice.toFixed(2)}`;
+        }
+        
+        return 'Price not available';
     };
 
     if (isLoading) {
@@ -299,9 +306,9 @@ export default function ProductList() {
                                                 Sale
                                             </span>
                                         )}
-                                        {product.original_price && product.original_price > product.price && (
+                                        {product.end_price && product.end_price > product.start_price && (
                                             <span className="inline-flex items-center px-2 py-1 text-xs font-bold text-white bg-orange-500 rounded-full">
-                                                {Math.round(((product.original_price - product.price) / product.original_price) * 100)}% OFF
+                                                {Math.round(((product.end_price - product.start_price) / product.end_price) * 100)}% OFF
                                             </span>
                                         )}
                                     </div>
@@ -335,19 +342,17 @@ export default function ProductList() {
                                             </span>
                                         )}
 
-                                        {/* Price */}
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <p className="text-base font-bold text-gray-900">
-                                                {formatPrice(product.price)}
-                                            </p>
-                                            {product.original_price && product.original_price > product.price && (
-                                                <span className="text-sm text-gray-400 line-through">
-                                                    {formatPrice(product.original_price)}
-                                                </span>
-                                            )}
-                                        </div>
-
-                                        {/* Product Title */}
+                        {/* Price */}
+                        <div className="flex items-center gap-2 mb-1">
+                            <p className="text-base font-bold text-gray-900">
+                                {formatPrice(product.start_price)}
+                            </p>
+                            {product.end_price && product.end_price > product.start_price && (
+                                <span className="text-sm text-gray-400 line-through">
+                                    {formatPrice(product.end_price)}
+                                </span>
+                            )}
+                        </div>                                        {/* Product Title */}
                                         <h3 className="text-base font-medium text-gray-900 mb-1">
                                             {product.name}
                                         </h3>
