@@ -83,6 +83,11 @@ const handleLogout = () => {
   clearTokens();
   if (isClientSide()) {
     localStorage.clear();
+    sessionStorage.clear();
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new Event('authChanged'));
+    
     setTimeout(() => {
       window.location.href = '/login';
     }, 100);

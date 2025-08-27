@@ -206,7 +206,14 @@ const Login = () => {
           window.dispatchEvent(new Event('authChanged'));
         }
         
-        window.location.href = "/";
+        // Check for redirect after login
+        const redirectPath = sessionStorage.getItem('redirectAfterLogin');
+        if (redirectPath) {
+          sessionStorage.removeItem('redirectAfterLogin');
+          window.location.href = redirectPath;
+        } else {
+          window.location.href = "/";
+        }
       } else {
         const errorData = await response.json();
         setErrorMessage(errorData.detail || errorData.message || errorData.error || "Invalid OTP. Please try again.");

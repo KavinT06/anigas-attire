@@ -30,35 +30,27 @@ export default function ProductDetail({ params }) {
 
     // Get available sizes from product data or fallback to defaults
     const getAvailableSizes = () => {
-        // Debug: Log the product data to see what we're working with
-        console.log('Product data for sizes:', product);
-        
         // If backend provides sizes in product.variants array (most common case)
         if (product?.variants && Array.isArray(product.variants) && product.variants.length > 0) {
             const sizes = product.variants.map(variant => variant.name).filter(Boolean);
-            console.log('Extracted sizes from variants:', sizes);
             return sizes;
         }
         
         // If backend provides sizes in product.sizes array
         if (product?.sizes && Array.isArray(product.sizes) && product.sizes.length > 0) {
-            console.log('Using product.sizes:', product.sizes);
             return product.sizes;
         }
         
         // If backend provides sizes in product.available_sizes
         if (product?.available_sizes && Array.isArray(product.available_sizes) && product.available_sizes.length > 0) {
-            console.log('Using product.available_sizes:', product.available_sizes);
             return product.available_sizes;
         }
         
         // If backend provides sizes in product.variant_names
         if (product?.variant_names && Array.isArray(product.variant_names) && product.variant_names.length > 0) {
-            console.log('Using product.variant_names:', product.variant_names);
             return product.variant_names;
         }
         
-        console.log('Using fallback sizes - no size data found in backend');
         // Fallback to include S-size in case backend doesn't provide size data
         return ['S', 'M', 'L', 'XL', 'XXL'];
     };

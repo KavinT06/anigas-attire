@@ -35,22 +35,24 @@ export const isAuthenticated = () => {
 
 /**
  * Logout user by clearing tokens and redirecting
+ * @param {string} redirectPath - Optional redirect path, defaults to '/login'
  */
-export const logout = () => {
+export const logout = (redirectPath = '/login') => {
   // Remove authentication cookies
   Cookie.remove("accessToken", { path: '/' });
   Cookie.remove("refreshToken", { path: '/' });
   
-  // Clear localStorage
+  // Clear localStorage and sessionStorage
   if (typeof window !== 'undefined') {
     localStorage.clear();
+    sessionStorage.clear();
     
     // Dispatch custom event to notify other components
     window.dispatchEvent(new Event('authChanged'));
     
-    // Redirect to home page
+    // Redirect to specified path
     setTimeout(() => {
-      window.location.href = '/';
+      window.location.href = redirectPath;
     }, 100);
   }
 };

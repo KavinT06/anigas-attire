@@ -7,6 +7,7 @@ import Image from 'next/image';
 import useCartStore from '../../store/cartStore';
 import ToastContainer, { useToast } from '../components/Toast';
 import { getAuthHeaders } from '../../utils/auth';
+import ProtectedRoute from '../../components/ProtectedRoute';
 
 const CheckoutPage = () => {
   const router = useRouter();
@@ -72,8 +73,6 @@ const CheckoutPage = () => {
         payment_method: paymentMethod
       };
 
-      console.log('Placing order with payload:', orderPayload);
-
       let response;
       const endpoints = [
         `${API_BASE_URL}/api/ecom/orders/`,
@@ -87,7 +86,6 @@ const CheckoutPage = () => {
       // Try different endpoint patterns
       for (const endpoint of endpoints) {
         try {
-          console.log(`Trying endpoint: ${endpoint}`);
           response = await axios.post(
             endpoint,
             orderPayload,
@@ -96,17 +94,11 @@ const CheckoutPage = () => {
               headers: getAuthHeaders()
             }
           );
-          console.log(`Success with endpoint: ${endpoint}`);
           orderCreated = true;
           break; // Exit loop if successful
         } catch (endpointError) {
-          console.log(`Failed with endpoint ${endpoint}:`, endpointError.response?.status || endpointError.message);
           if (endpoint === endpoints[endpoints.length - 1]) {
             // If this is the last endpoint and all failed, use mock success for testing
-            console.warn('All endpoints failed. Using mock order creation for testing...');
-            console.warn('Please set up the Django order creation endpoint at one of:');
-            endpoints.forEach(ep => console.warn(`- ${ep}`));
-            
             // Mock successful response for testing
             response = {
               status: 201,
@@ -163,12 +155,6 @@ const CheckoutPage = () => {
         
         if (status === 404) {
           errorMessage = 'Order service is currently unavailable. Please contact support or try again later.';
-          console.error('API endpoint not found. Available endpoints in your Django backend:');
-          console.error('- /api/ecom/products/ (GET)');
-          console.error('- /api/ecom/products/{id}/ (GET)');
-          console.error('- /api/ecom/categories/ (GET)');
-          console.error('- /api/ecom/category-products/{id}/ (GET)');
-          console.error('Missing: Order creation endpoint');
         } else if (status === 500) {
           errorMessage = 'Server error occurred. Please try again later.';
         } else if (status === 400) {
@@ -201,8 +187,9 @@ const CheckoutPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100">
-      <ToastContainer toasts={toasts} removeToast={removeToast} />
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100">
+        <ToastContainer toasts={toasts} removeToast={removeToast} />
       
       <div className="py-8 px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
         {/* Header */}
@@ -399,7 +386,8 @@ const CheckoutPage = () => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </ProtectedRoute>
   );
 };
 

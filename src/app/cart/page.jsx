@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import useCartStore from '../../store/cartStore';
 import ToastContainer, { useToast } from '../components/Toast';
+import ProtectedRoute from '../../components/ProtectedRoute';
 
 const CartPage = () => {
   const { 
@@ -44,10 +45,11 @@ const CartPage = () => {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100">
-        <ToastContainer toasts={toasts} removeToast={removeToast} />
-        
-        <div className="py-16 px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+      <ProtectedRoute>
+        <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100">
+          <ToastContainer toasts={toasts} removeToast={removeToast} />
+          
+          <div className="py-16 px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-8">
               <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -75,12 +77,14 @@ const CartPage = () => {
           </div>
         </div>
       </div>
+      </ProtectedRoute>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100">
-      <ToastContainer toasts={toasts} removeToast={removeToast} />
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100">
+        <ToastContainer toasts={toasts} removeToast={removeToast} />
       
       <div className="py-8 px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
         {/* Header */}
@@ -247,7 +251,8 @@ const CartPage = () => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </ProtectedRoute>
   );
 };
 
