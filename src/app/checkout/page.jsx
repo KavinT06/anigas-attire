@@ -7,6 +7,7 @@ import Image from 'next/image';
 import useCartStore from '../../store/cartStore';
 import Header from '../components/Header';
 import ToastContainer, { useToast } from '../components/Toast';
+import { getAuthHeaders } from '../../utils/auth';
 
 const CheckoutPage = () => {
   const router = useRouter();
@@ -93,9 +94,7 @@ const CheckoutPage = () => {
             orderPayload,
             {
               timeout: 15000,
-              headers: {
-                'Content-Type': 'application/json',
-              }
+              headers: getAuthHeaders()
             }
           );
           console.log(`Success with endpoint: ${endpoint}`);

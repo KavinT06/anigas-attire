@@ -7,6 +7,7 @@ import Image from 'next/image';
 import useCartStore from '../../../store/cartStore';
 import toast, { Toaster } from 'react-hot-toast';
 import Header from '../../components/Header';
+import { getAuthHeaders } from '../../../utils/auth';
 
 export default function ProductDetail({ params }) {
     const [product, setProduct] = useState(null);
@@ -172,9 +173,7 @@ export default function ProductDetail({ params }) {
 
             const response = await axios.get(`${API_BASE_URL}/api/ecom/products/${productId}/`, {
                 timeout: 10000,
-                headers: {
-                    'Content-Type': 'application/json',
-                }
+                headers: getAuthHeaders()
             });
 
             if (response.status === 200) {

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import Image from 'next/image';
+import { getAuthHeaders } from '../../utils/auth';
 import logo from "../../assets/logo.jpg";
 
 export default function CategoryList() {
@@ -26,9 +27,7 @@ export default function CategoryList() {
 
             const response = await axios.get(`${API_BASE_URL}/api/ecom/categories/`, {
                 timeout: 10000,
-                headers: {
-                    'Content-Type': 'application/json',
-                }
+                headers: getAuthHeaders()
             });
 
             if (response.status === 200) {

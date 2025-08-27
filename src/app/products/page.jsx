@@ -7,6 +7,7 @@ import Image from 'next/image';
 import useCartStore from '../../store/cartStore';
 import Header from '../components/Header';
 import ToastContainer, { useToast } from '../components/Toast';
+import { getAuthHeaders } from '../../utils/auth';
 import logo from "../../assets/logo.jpg";
 
 export default function ProductList() {
@@ -55,9 +56,7 @@ export default function ProductList() {
 
             const response = await axios.get(endpoint, {
                 timeout: 10000,
-                headers: {
-                    'Content-Type': 'application/json',
-                }
+                headers: getAuthHeaders()
             });
 
             if (response.status === 200) {
