@@ -5,6 +5,7 @@ import Image from 'next/image';
 import useCartStore from '../../store/cartStore';
 import ToastContainer, { useToast } from '../components/Toast';
 import ProtectedRoute from '../../components/ProtectedRoute';
+import ProfileCompletionBanner from '../components/ProfileCompletionBanner';
 
 const CartPage = () => {
   const { 
@@ -94,6 +95,9 @@ const CartPage = () => {
             {totalItems} {totalItems === 1 ? 'item' : 'items'} in your cart
           </p>
         </div>
+
+        {/* Profile Completion Banner */}
+        <ProfileCompletionBanner currentPage="cart" />
 
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-12 lg:items-start">
           {/* Cart Items */}

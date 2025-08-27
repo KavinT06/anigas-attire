@@ -1,6 +1,7 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { isAuthenticated } from '../utils/auth';
+import api from '../utils/axiosInstance';
 
 const AuthContext = createContext(null);
 
@@ -19,7 +20,7 @@ export const AuthProvider = ({ children }) => {
   const [mounted, setMounted] = useState(false);
 
   // Configuration flag for optional user profile endpoint
-  const ENABLE_USER_PROFILE = false; // Set to true when backend has user profile endpoint
+  const ENABLE_USER_PROFILE = true; // Set to true when backend has user profile endpoint
 
   // Check authentication status
   const checkAuthStatus = () => {
@@ -49,19 +50,39 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      // TODO: Uncomment when backend has user profile endpoint
-      // const response = await api.get('/api/auth/profile/');
-      // setUser(response.data);
+      const response = await api.get('/api/profile/');
+      setUser(response.data);
     } catch (error) {
-      console.warn('Failed to load user profile:', error);
-      // Use fallback user data
-      setUser({
-        id: 'user-' + Date.now(),
-        name: 'User',
-        phone: null,
-        email: null,
-        avatar: null
-      });
+      // If profile endpoint returns 404, try auth endpoints or use minimal data
+      if (error.response?.status === 404) {
+        try {
+          // Try alternative auth endpoint
+          const authResponse = await api.get('/api/auth/me/');
+          setUser(authResponse.data);
+        } catch (authError) {
+          // Use minimal fallback user data that works with address-only profile
+          setUser({
+            id: 'user-' + Date.now(),
+            name: 'User',
+            phone: null,
+            phone_number: null,
+            mobile: null,
+            email: null,
+            avatar: null
+          });
+        }
+      } else {
+        // For other errors, use fallback data
+        setUser({
+          id: 'user-' + Date.now(),
+          name: 'User',
+          phone: null,
+          phone_number: null,
+          mobile: null,
+          email: null,
+          avatar: null
+        });
+      }
     }
   };
 
@@ -136,15 +157,16 @@ export const AuthProvider = ({ children }) => {
     checkAuthStatus,
     handleLoginSuccess,
     handleLogout,
+    loadUserProfile, // Add this for profile page to refresh user data
     // Helper methods
     getUserDisplayName: () => {
       if (!user) return 'User';
-      return user.name || user.phone || 'User';
+      return user.name || user.phone || user.phone_number || 'User';
     },
     getUserAvatar: () => {
       if (user?.avatar) return user.avatar;
       // Generate avatar from first letter of name
-      const name = user?.name || user?.phone || 'User';
+      const name = user?.name || user?.phone || user?.phone_number || 'User';
       return name.charAt(0).toUpperCase();
     }
   };

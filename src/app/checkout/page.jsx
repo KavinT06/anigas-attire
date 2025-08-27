@@ -8,20 +8,37 @@ import useCartStore from '../../store/cartStore';
 import ToastContainer, { useToast } from '../components/Toast';
 import { getAuthHeaders } from '../../utils/auth';
 import ProtectedRoute from '../../components/ProtectedRoute';
+import ProfileCompletionBanner from '../components/ProfileCompletionBanner';
+import { useProfile } from '../../hooks/useProfile';
 
 const CheckoutPage = () => {
   const router = useRouter();
   const { items, getTotalPrice, getTotalItems, clearCart } = useCartStore();
   const { toasts, removeToast, toast } = useToast();
+  const { profile, loading: profileLoading, fetchProfile, getProfileField } = useProfile();
   
   // Form states
   const [address, setAddress] = useState('');
   const [paymentMethod] = useState('COD'); // Only COD for now
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [formErrors, setFormErrors] = useState({});
+  const [useProfileAddress, setUseProfileAddress] = useState(false);
 
   // Configure Django backend URL
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5025';
+
+  // Load profile data on mount
+  useEffect(() => {
+    fetchProfile(false); // Load silently without toast
+  }, [fetchProfile]);
+
+  // Auto-fill address from profile
+  useEffect(() => {
+    if (profile && getProfileField('address') && !address) {
+      setAddress(getProfileField('address'));
+      setUseProfileAddress(true);
+    }
+  }, [profile, getProfileField, address]);
 
   // Scroll to top on mount
   useEffect(() => {
@@ -200,6 +217,9 @@ const CheckoutPage = () => {
           </p>
         </div>
 
+        {/* Profile Completion Banner */}
+        <ProfileCompletionBanner currentPage="checkout" />
+
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-12">
           {/* Order Summary */}
           <div className="lg:col-span-7 mb-8 lg:mb-0">
@@ -262,6 +282,38 @@ const CheckoutPage = () => {
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h2 className="text-lg font-medium text-gray-900 mb-4">Delivery Information</h2>
               
+              {/* Profile Address Option */}
+              {profile && getProfileField('address') && (
+                <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center">
+                      <input
+                        id="useProfileAddress"
+                        type="checkbox"
+                        checked={useProfileAddress}
+                        onChange={(e) => {
+                          setUseProfileAddress(e.target.checked);
+                          if (e.target.checked) {
+                            setAddress(getProfileField('address'));
+                          } else {
+                            setAddress('');
+                          }
+                        }}
+                        className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+                      />
+                      <label htmlFor="useProfileAddress" className="ml-2 text-sm font-medium text-blue-900">
+                        Use address from my profile
+                      </label>
+                    </div>
+                  </div>
+                  {useProfileAddress && (
+                    <div className="mt-2 p-2 bg-white rounded border">
+                      <p className="text-sm text-gray-700">{getProfileField('address')}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+              
               <div className="space-y-4">
                 <div>
                   <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
@@ -271,7 +323,10 @@ const CheckoutPage = () => {
                     id="address"
                     rows={4}
                     value={address}
-                    onChange={(e) => setAddress(e.target.value)}
+                    onChange={(e) => {
+                      setAddress(e.target.value);
+                      setUseProfileAddress(false); // Uncheck when manually edited
+                    }}
                     placeholder="Enter your complete delivery address including street, city, postal code..."
                     className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 ${
                       formErrors.address ? 'border-red-500' : 'border-gray-300'
@@ -279,6 +334,11 @@ const CheckoutPage = () => {
                   />
                   {formErrors.address && (
                     <p className="mt-1 text-sm text-red-600">{formErrors.address}</p>
+                  )}
+                  {!profile && (
+                    <p className="mt-1 text-sm text-blue-600">
+                      💡 Tip: <a href="/profile" className="underline hover:text-blue-800">Complete your profile</a> to save addresses for faster checkout
+                    </p>
                   )}
                 </div>
               </div>

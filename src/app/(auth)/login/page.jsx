@@ -202,6 +202,9 @@ const Login = () => {
             Cookie.set("refreshToken", refreshToken, { expires: 7 });
           }
           
+          // Store phone number for profile use (since backend profile endpoint might not exist)
+          localStorage.setItem('userPhone', phone_number);
+          
           // Dispatch custom event to notify header about auth change
           window.dispatchEvent(new Event('authChanged'));
         }

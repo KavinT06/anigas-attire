@@ -199,6 +199,13 @@ const Header = () => {
                 {showDropdown && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
                     <Link 
+                      href="/profile" 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+                      onClick={() => setShowDropdown(false)}
+                    >
+                      👤 Profile
+                    </Link>
+                    <Link 
                       href="/account/orders" 
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
                       onClick={() => setShowDropdown(false)}
@@ -296,6 +303,13 @@ const Header = () => {
                         👋 Hi, {getUserDisplayName()}
                       </span>
                     </div>
+                    <Link 
+                      href="/profile" 
+                      className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-orange-500 hover:bg-gray-50 rounded-md transition-colors duration-200"
+                      onClick={closeMobileMenu}
+                    >
+                      👤 Profile
+                    </Link>
                     <Link 
                       href="/account/orders" 
                       className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-orange-500 hover:bg-gray-50 rounded-md transition-colors duration-200"
