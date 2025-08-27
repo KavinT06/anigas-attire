@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import Image from 'next/image';
 import useCartStore from '../../store/cartStore';
-import Header from '../components/Header';
 import ToastContainer, { useToast } from '../components/Toast';
 import { getAuthHeaders } from '../../utils/auth';
 
@@ -203,7 +202,6 @@ const CheckoutPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100">
-      <Header />
       <ToastContainer toasts={toasts} removeToast={removeToast} />
       
       <div className="py-8 px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">

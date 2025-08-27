@@ -3,7 +3,6 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import Header from '../components/Header';
 
 const OrderSuccessContent = () => {
   const searchParams = useSearchParams();
@@ -32,8 +31,6 @@ const OrderSuccessContent = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100">
-      <Header />
-      
       <div className="py-16 px-4 mx-auto max-w-4xl sm:px-6 lg:px-8">
         <div className="text-center">
           {/* Success Icon */}

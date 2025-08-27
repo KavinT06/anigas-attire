@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import Image from 'next/image';
 import useCartStore from '../../store/cartStore';
-import Header from '../components/Header';
 import ToastContainer, { useToast } from '../components/Toast';
 import { getAuthHeaders } from '../../utils/auth';
 import logo from "../../assets/logo.jpg";
@@ -181,7 +180,6 @@ export default function ProductList() {
     if (isLoading) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100">
-                <Header />
                 <ToastContainer toasts={toasts} removeToast={removeToast} />
                 <div className="flex items-center justify-center py-20">
                     <div className="text-center">
@@ -195,7 +193,6 @@ export default function ProductList() {
 
     return (
         <div className="bg-gradient-to-b from-green-50 to-green-100 min-h-screen">
-            <Header />
             <ToastContainer toasts={toasts} removeToast={removeToast} />
 
             {/* Main Content */}

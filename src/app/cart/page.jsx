@@ -3,7 +3,6 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import useCartStore from '../../store/cartStore';
-import Header from '../components/Header';
 import ToastContainer, { useToast } from '../components/Toast';
 
 const CartPage = () => {
@@ -46,7 +45,6 @@ const CartPage = () => {
   if (items.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100">
-        <Header />
         <ToastContainer toasts={toasts} removeToast={removeToast} />
         
         <div className="py-16 px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -82,7 +80,6 @@ const CartPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100">
-      <Header />
       <ToastContainer toasts={toasts} removeToast={removeToast} />
       
       <div className="py-8 px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">

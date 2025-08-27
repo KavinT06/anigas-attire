@@ -6,7 +6,6 @@ import axios from 'axios';
 import Image from 'next/image';
 import useCartStore from '../../../store/cartStore';
 import toast, { Toaster } from 'react-hot-toast';
-import Header from '../../components/Header';
 import { getAuthHeaders } from '../../../utils/auth';
 
 export default function ProductDetail({ params }) {
@@ -247,8 +246,6 @@ export default function ProductDetail({ params }) {
     return (
         <div className="bg-white min-h-screen">
             <Toaster />
-            {/* Header */}
-            <Header />
 
             {/* Product Detail */}
             <div className="max-w-6xl mx-auto px-4 py-8">

@@ -201,6 +201,9 @@ const Login = () => {
           if (refreshToken) {
             Cookie.set("refreshToken", refreshToken, { expires: 7 });
           }
+          
+          // Dispatch custom event to notify header about auth change
+          window.dispatchEvent(new Event('authChanged'));
         }
         
         window.location.href = "/";

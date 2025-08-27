@@ -32,3 +32,25 @@ export const getAuthHeaders = () => {
 export const isAuthenticated = () => {
   return !!getAccessToken();
 };
+
+/**
+ * Logout user by clearing tokens and redirecting
+ */
+export const logout = () => {
+  // Remove authentication cookies
+  Cookie.remove("accessToken", { path: '/' });
+  Cookie.remove("refreshToken", { path: '/' });
+  
+  // Clear localStorage
+  if (typeof window !== 'undefined') {
+    localStorage.clear();
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new Event('authChanged'));
+    
+    // Redirect to home page
+    setTimeout(() => {
+      window.location.href = '/';
+    }, 100);
+  }
+};

@@ -74,26 +74,6 @@ export default function CategoryList() {
 
     return (
         <div className="bg-gradient-to-b from-green-50 to-green-100 min-h-screen">
-            {/* Header */}
-            <header className="bg-white shadow-sm">
-                <div className="px-4 mx-auto sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between h-16 lg:h-20">
-                        <div className="flex-shrink-0 inline-flex">
-                            <a href="/" title="" className="flex">
-                                <Image className="w-auto h-7 xl:h-10 xl:ml-28 rounded-lg" src={logo} alt="Aniga's Attire Logo" />
-                            </a>
-                            <p className='text-xl ml-1.5 mt-0.5 font-bold text-black'>Aniga's Attire</p>
-                        </div>
-                        <div className="hidden ml-auto lg:flex lg:items-center lg:justify-center lg:space-x-10">
-                            <a href="/" title="" className="text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80">Home</a>
-                            <a href="/categories" title="" className="text-base font-semibold text-orange-500 transition-all duration-200 hover:text-opacity-80">Categories</a>
-                            <a href="/products" title="" className="text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80">All Products</a>
-                            <a href="/login" title="" className="text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80">Log in</a>
-                        </div>
-                    </div>
-                </div>
-            </header>
-
             {/* Main Content */}
             <section className="py-12 sm:py-16 lg:py-20">
                 <div className="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl">
