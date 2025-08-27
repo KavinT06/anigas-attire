@@ -76,9 +76,27 @@ const Header = () => {
               <Link href="/" className="text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80">Home</Link>
               <Link href="/categories" className="text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80">Categories</Link>
               <Link href="/products" className="text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80">Products</Link>
+              <Link 
+                href="/cart" 
+                className="relative text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80 flex items-center space-x-1"
+              >
+                <svg 
+                  className="w-5 h-5" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth="2" 
+                    d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 9.5M7 13h10" 
+                  />
+                </svg>
+                <span>Cart</span>
+              </Link>
               <div className="w-px h-5 bg-black/20"></div>
-              <div className="w-16 h-6"></div> {/* Placeholder for auth button */}
-              <Link href="/categories" className="inline-flex items-center justify-center px-5 py-2.5 text-base font-semibold text-black border-2 border-black hover:bg-black hover:text-white transition-all duration-200 focus:bg-black focus:text-white">Browse Categories</Link>
+              <div className="w-20 h-10 border-2 border-gray-300 rounded"></div> {/* Placeholder for auth button */}
             </div>
           </div>
         </div>
@@ -152,19 +170,18 @@ const Header = () => {
             {isUserAuthenticated ? (
               <button 
                 onClick={handleLogout}
-                className="text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80"
+                className="inline-flex items-center justify-center px-5 py-2.5 text-base font-semibold text-black border-2 border-black hover:bg-black hover:text-white transition-all duration-200 focus:bg-black focus:text-white"
               >
                 Log out
               </button>
             ) : (
-              <Link href="/login" className="text-base font-semibold text-black transition-all duration-200 hover:text-opacity-80">
+              <Link 
+                href="/login" 
+                className="inline-flex items-center justify-center px-5 py-2.5 text-base font-semibold text-black border-2 border-black hover:bg-black hover:text-white transition-all duration-200 focus:bg-black focus:text-white"
+              >
                 Log in
               </Link>
             )}
-
-            <Link href="/categories" className="inline-flex items-center justify-center px-5 py-2.5 text-base font-semibold text-black border-2 border-black hover:bg-black hover:text-white transition-all duration-200 focus:bg-black focus:text-white" role="button">
-              Browse Categories
-            </Link>
           </div>
         </div>
       </div>
