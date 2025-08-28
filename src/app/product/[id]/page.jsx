@@ -7,6 +7,7 @@ import Image from 'next/image';
 import useCartStore from '../../../store/cartStore';
 import toast, { Toaster } from 'react-hot-toast';
 import { getAuthHeaders } from '../../../utils/auth';
+import { useWishlist } from '../../../contexts/WishlistContext';
 
 export default function ProductDetail({ params }) {
     const [product, setProduct] = useState(null);
@@ -15,11 +16,17 @@ export default function ProductDetail({ params }) {
     const [selectedSize, setSelectedSize] = useState('');
     const [quantity, setQuantity] = useState(1);
     const [isAddingToCart, setIsAddingToCart] = useState(false);
-    const [wishlist, setWishlist] = useState([]);
     const router = useRouter();
     
     // Use cart store
     const { addToCart } = useCartStore();
+    
+    // Use wishlist context
+    const { 
+        isInWishlist, 
+        toggleWishlistItem, 
+        loading: wishlistLoading 
+    } = useWishlist();
     
     // Unwrap params Promise using React.use()
     const resolvedParams = React.use(params);
@@ -71,48 +78,19 @@ export default function ProductDetail({ params }) {
         }
     }, [product, selectedSize]);
 
-    // Load wishlist from localStorage
-    useEffect(() => {
-        const savedWishlist = localStorage.getItem('wishlist');
-        if (savedWishlist) {
-            setWishlist(JSON.parse(savedWishlist));
-        }
-    }, []);
-
-    // Check if product is in wishlist
-    const isInWishlist = () => {
-        return wishlist.some(item => item.id === product?.id);
-    };
-
-    // Add/remove from wishlist
-    const toggleWishlist = () => {
+    // Handle wishlist toggle
+    const handleWishlistToggle = async () => {
         if (!product) return;
 
-        let updatedWishlist;
-        if (isInWishlist()) {
-            // Remove from wishlist
-            updatedWishlist = wishlist.filter(item => item.id !== product.id);
-            toast.success('Removed from wishlist', {
-                icon: '💔',
-                duration: 2000,
-            });
-        } else {
-            // Add to wishlist
-            updatedWishlist = [...wishlist, {
-                id: product.id,
-                name: product.name,
-                price: product.start_price,
-                image: product.images?.[0]?.image_url,
-                category_name: product.category_name
-            }];
-            toast.success('Added to wishlist', {
-                icon: '❤️',
-                duration: 2000,
-            });
-        }
-        
-        setWishlist(updatedWishlist);
-        localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
+        const productData = {
+            id: product.id,
+            name: product.name,
+            start_price: product.start_price,
+            images: product.images,
+            category_name: product.category_name
+        };
+
+        await toggleWishlistItem(product.id, productData);
     };
 
     // Handle add to cart
@@ -390,24 +368,33 @@ export default function ProductDetail({ params }) {
                                         Back to Products
                                     </button>
                                     <button 
-                                        onClick={toggleWishlist}
-                                        className={`flex-1 py-3 px-6 rounded-lg font-medium transition-colors duration-200 ${
-                                            isInWishlist()
+                                        onClick={handleWishlistToggle}
+                                        disabled={wishlistLoading}
+                                        className={`flex-1 py-3 px-6 rounded-lg font-medium transition-all duration-200 relative ${
+                                            isInWishlist(product?.id)
                                                 ? 'border border-pink-300 text-pink-600 bg-pink-50 hover:bg-pink-100'
                                                 : 'border border-gray-200 text-gray-600 bg-gray-50 hover:bg-gray-100'
-                                        }`}
+                                        } ${wishlistLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
                                     >
-                                        {isInWishlist() ? (
-                                            <span className="flex items-center gap-2">
+                                        {wishlistLoading ? (
+                                            <span className="flex items-center justify-center gap-2">
+                                                <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                                {isInWishlist(product?.id) ? 'Removing...' : 'Adding...'}
+                                            </span>
+                                        ) : isInWishlist(product?.id) ? (
+                                            <span className="flex items-center justify-center gap-2">
                                                 <svg className="w-5 h-5 text-red-500 fill-current" viewBox="0 0 24 24">
                                                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                                                 </svg>
                                                 In Wishlist
                                             </span>
                                         ) : (
-                                            <span className="flex items-center gap-2">
-                                                <svg className="w-5 h-5 text-gray-400 fill-current" viewBox="0 0 24 24">
-                                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                            <span className="flex items-center justify-center gap-2">
+                                                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                                                 </svg>
                                                 Add to Wishlist
                                             </span>

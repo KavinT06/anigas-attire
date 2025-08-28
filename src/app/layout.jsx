@@ -3,6 +3,7 @@ import "./globals.css";
 import 'flowbite/dist/flowbite.css';
 import Header from './components/Header';
 import { AuthProvider } from '../contexts/AuthContext';
+import { WishlistProvider } from '../contexts/WishlistContext';
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -26,8 +27,10 @@ export default function RootLayout({ children }) {
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
             >
                 <AuthProvider>
-                    <Header />
-                    {children}
+                    <WishlistProvider>
+                        <Header />
+                        {children}
+                    </WishlistProvider>
                 </AuthProvider>
             </body>
         </html>

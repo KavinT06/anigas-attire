@@ -1,33 +1,158 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Anigas Attire - E-commerce Frontend
 
-## Getting Started
+A modern e-commerce frontend built with Next.js, featuring user authentication, product catalog, shopping cart, wishlist functionality, and order management.
 
-First, run the development server:
+## 🚀 Features
 
+- **User Authentication**: Secure login/logout with JWT tokens
+- **Product Catalog**: Browse products by categories with search and filtering
+- **Shopping Cart**: Add items to cart, manage quantities, and proceed to checkout
+- **Wishlist**: Save products for later with persistent storage
+- **Order Management**: Place orders and view order history
+- **Profile Management**: Update user profile information
+- **Responsive Design**: Optimized for mobile and desktop devices
+- **Real-time Updates**: Dynamic cart and wishlist counters
+
+## 🛠 Tech Stack
+
+- **Framework**: Next.js 15.3.4 with App Router
+- **Styling**: Tailwind CSS
+- **State Management**: Zustand for cart, React Context for auth and wishlist
+- **HTTP Client**: Axios with custom instance
+- **UI Components**: Custom components with Heroicons
+- **Authentication**: JWT with cookies
+- **Notifications**: React Hot Toast
+
+## 📦 Installation
+
+1. **Clone the repository**:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd anigas-attire
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **Install dependencies**:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+3. **Environment Setup**:
+Create a `.env.local` file in the root directory:
+```env
+NEXT_PUBLIC_API_BASE_URL=http://localhost:5025
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. **Run the development server**:
+```bash
+npm run dev
+```
 
-## Learn More
+Open [http://localhost:3000](http://localhost:3000) to view the application.
 
-To learn more about Next.js, take a look at the following resources:
+## 🏗 Project Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+src/
+├── app/
+│   ├── (auth)/login/          # Authentication pages
+│   ├── account/orders/        # Order history
+│   ├── cart/                  # Shopping cart
+│   ├── categories/            # Product categories
+│   ├── checkout/              # Checkout process
+│   ├── components/            # Reusable UI components
+│   ├── product/[id]/          # Product detail pages
+│   ├── products/              # Product listing
+│   ├── profile/               # User profile
+│   └── wishlist/              # Wishlist management
+├── components/                # Global components
+├── contexts/                  # React Context providers
+├── hooks/                     # Custom React hooks
+├── store/                     # Zustand stores
+├── utils/                     # Utility functions and API calls
+└── assets/                    # Static assets
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🔧 Configuration
+
+### Backend Integration
+The application is designed to work with a Django REST API backend. It includes fallback to localStorage for development when the backend is not available.
+
+### API Endpoints
+- Authentication: `/api/auth/`
+- Products: `/api/ecom/products/`
+- Cart: Client-side with localStorage
+- Wishlist: `/api/wishlist/` (with localStorage fallback)
+- Orders: `/api/orders/`
+- Profile: `/api/profile/`
+
+## 🚀 Deployment
+
+### Build for Production
+```bash
+npm run build
+npm start
+```
+
+### Environment Variables for Production
+```env
+NEXT_PUBLIC_API_BASE_URL=https://your-api-domain.com
+```
+
+## 🧪 Development
+
+### Code Quality
+- ESLint configured for Next.js best practices
+- Consistent code formatting
+- Clean component architecture
+- Proper error handling
+
+### Key Features Implementation
+
+#### Authentication Flow
+- JWT token management with cookies
+- Protected routes with `ProtectedRoute` component
+- Automatic token refresh handling
+
+#### Cart Management
+- Persistent cart with localStorage
+- Real-time updates across components
+- Support for product variants (sizes)
+
+#### Wishlist System
+- Backend-first with localStorage fallback
+- Optimistic updates for better UX
+- Type-safe ID matching across different data structures
+
+## 📱 Mobile Responsiveness
+
+The application is fully responsive with:
+- Mobile-first design approach
+- Responsive navigation with mobile menu
+- Touch-friendly UI elements
+- Optimized images and loading states
+
+## 🔒 Security
+
+- Secure authentication with JWT
+- CSRF protection
+- Input validation and sanitization
+- Secure API communication
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## 📄 License
+
+This project is private and proprietary.
+
+---
+
+Built with ❤️ using Next.js and modern web technologies.
 
 ## Deploy on Vercel
 

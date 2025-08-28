@@ -1,12 +1,16 @@
 {
   "name": "anigas-attire",
   "version": "0.1.0",
+  "description": "Modern e-commerce frontend built with Next.js",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "export": "next export",
+    "analyze": "cross-env ANALYZE=true next build"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

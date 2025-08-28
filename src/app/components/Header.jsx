@@ -5,6 +5,7 @@ import Image from 'next/image';
 import useCartStore from '../../store/cartStore';
 import { logout } from '../../utils/auth';
 import { useAuth } from '../../contexts/AuthContext';
+import { useWishlist } from '../../contexts/WishlistContext';
 import logo from '../../assets/logo.jpg';
 
 const Header = () => {
@@ -13,6 +14,7 @@ const Header = () => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const { getTotalItems } = useCartStore();
   const { isLoggedIn, user, mounted, getUserDisplayName, getUserAvatar } = useAuth();
+  const { getWishlistCount } = useWishlist();
 
   useEffect(() => {
     const updateCartCount = () => {
@@ -217,7 +219,11 @@ const Header = () => {
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
                       onClick={() => setShowDropdown(false)}
                     >
-                      ❤️ Wishlist
+                      ❤️ Wishlist {getWishlistCount() > 0 && (
+                        <span className="inline-flex items-center justify-center px-2 py-1 mr-2 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
+                          {getWishlistCount()}
+                        </span>
+                      )}
                     </Link>
                     <button 
                       onClick={handleLogout}
@@ -322,7 +328,11 @@ const Header = () => {
                       className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-orange-500 hover:bg-gray-50 rounded-md transition-colors duration-200"
                       onClick={closeMobileMenu}
                     >
-                      ❤️ Wishlist
+                      ❤️ Wishlist {getWishlistCount() > 0 && (
+                        <span className="inline-flex items-center justify-center px-2 py-1 ml-2 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
+                          {getWishlistCount()}
+                        </span>
+                      )}
                     </Link>
                     <button 
                       onClick={handleLogout}
