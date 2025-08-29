@@ -1,9 +1,10 @@
 import api from './axiosInstance';
 import Cookie from 'js-cookie';
+import { ECOM_ENDPOINTS } from './apiConfig';
 
 /**
  * Wishlist API utilities for interacting with Django backend
- * Base URL: /api/wishlist/
+ * Base URL: /api/ecom/wishlist/
  */
 
 /**

@@ -10,6 +10,7 @@ import { getAuthHeaders } from '../../utils/auth';
 import ProtectedRoute from '../../components/ProtectedRoute';
 import ProfileCompletionBanner from '../components/ProfileCompletionBanner';
 import { useProfile } from '../../hooks/useProfile';
+import { API_BASE_URL, ECOM_ENDPOINTS } from '../../utils/apiConfig';
 
 const CheckoutPage = () => {
   const router = useRouter();
@@ -23,9 +24,6 @@ const CheckoutPage = () => {
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const [useProfileAddress, setUseProfileAddress] = useState(false);
-
-  // Configure Django backend URL
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5025';
 
   // Load profile data on mount
   useEffect(() => {
@@ -92,7 +90,7 @@ const CheckoutPage = () => {
 
       let response;
       const endpoints = [
-        `${API_BASE_URL}/api/ecom/orders/`,
+        ECOM_ENDPOINTS.orders,
         `${API_BASE_URL}/api/ecom/order/create/`,
         `${API_BASE_URL}/api/order/create/`,
         `${API_BASE_URL}/api/orders/`

@@ -2,7 +2,8 @@ import api from './axiosInstance';
 
 /**
  * Profile API utilities for interacting with Django backend
- * Base URL: /api/profile/
+ * Note: Since /api/profile/ endpoint doesn't exist in your backend,
+ * this uses fallback approaches or minimal data structures
  */
 
 /**
@@ -10,54 +11,39 @@ import api from './axiosInstance';
  * @returns {Promise} Profile data from backend
  */
 export const getUserProfile = async () => {
-  try {
-    // Try the profile endpoint first
-    const response = await api.get('/api/profile/');
-    return {
-      success: true,
-      data: response.data,
-      error: null
-    };
-  } catch (error) {
-    // If profile endpoint doesn't exist (404), try alternative approaches
-    if (error.response?.status === 404) {
-      // Try to get user info from auth endpoint or use stored data
+  // Use localStorage for profile data
+  let localProfile = {
+    address: '',
+    phone_number: null,
+    phone: null,
+    mobile: null,
+    name: 'User',
+    email: null
+  };
+  
+  if (typeof window !== 'undefined') {
+    const stored = localStorage.getItem('userProfile');
+    if (stored) {
       try {
-        // Option 1: Try auth/me or similar endpoint
-        const authResponse = await api.get('/api/auth/me/');
-        return {
-          success: true,
-          data: authResponse.data,
-          error: null
-        };
-      } catch (authError) {
-        // Option 2: Return minimal data structure for address-only functionality
-        // Since we only need address, we can work with minimal profile data
-        return {
-          success: true,
-          data: {
-            // Minimal structure for address functionality
-            address: '', // Empty address that user can fill
-            phone_number: null, // Will be handled separately
-            phone: null,
-            mobile: null
-          },
-          error: null
-        };
+        localProfile = { ...localProfile, ...JSON.parse(stored) };
+      } catch (e) {
+        console.error('Error parsing stored profile data:', e);
       }
     }
     
-    // For other errors, return the original error response
-    return {
-      success: false,
-      data: null,
-      error: {
-        status: error.response?.status,
-        message: error.response?.data?.detail || error.response?.data?.message || 'Failed to fetch profile',
-        data: error.response?.data
-      }
-    };
+    // Also check for phone number stored during login
+    const storedPhone = localStorage.getItem('userPhone');
+    if (storedPhone) {
+      localProfile.phone_number = storedPhone;
+      localProfile.phone = storedPhone;
+    }
   }
+  
+  return {
+    success: true,
+    data: localProfile,
+    error: null
+  };
 };
 
 /**
@@ -70,17 +56,28 @@ export const getUserProfile = async () => {
  */
 export const updateUserProfile = async (profileData) => {
   try {
-    // Prepare data for backend (remove any read-only fields)
-    const updateData = {
-      name: profileData.name,
-      email: profileData.email,
-      address: profileData.address
-    };
+    // Since /api/profile/ endpoint doesn't exist in your backend,
+    // we'll store the data locally and return success
+    // You can implement backend profile update when the endpoint is available
+    
+    // Store locally for now
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('userProfile', JSON.stringify({
+        name: profileData.name,
+        email: profileData.email,
+        address: profileData.address,
+        updated_at: new Date().toISOString()
+      }));
+    }
 
-    const response = await api.put('/api/profile/', updateData);
     return {
       success: true,
-      data: response.data,
+      data: {
+        name: profileData.name,
+        email: profileData.email,
+        address: profileData.address,
+        message: 'Profile data saved locally. Backend profile endpoint not available.'
+      },
       error: null
     };
   } catch (error) {
@@ -89,10 +86,9 @@ export const updateUserProfile = async (profileData) => {
       success: false,
       data: null,
       error: {
-        status: error.response?.status,
-        message: error.response?.data?.detail || error.response?.data?.message || 'Failed to update profile',
-        data: error.response?.data,
-        validationErrors: error.response?.status === 400 ? error.response.data : null
+        status: 500,
+        message: 'Failed to save profile data locally',
+        data: error.message
       }
     };
   }
@@ -188,15 +184,17 @@ export const checkProfileCompleteness = (profileData) => {
 
 /**
  * Profile API endpoints configuration
- * Useful for reference and potential future endpoints
+ * Note: These endpoints are not available in your current backend
+ * They are kept for reference if you decide to implement them later
  */
 export const PROFILE_ENDPOINTS = {
-  GET_PROFILE: '/api/profile/',
-  UPDATE_PROFILE: '/api/profile/',
-  // Future endpoints
-  UPLOAD_AVATAR: '/api/profile/avatar/',
-  CHANGE_PASSWORD: '/api/profile/change-password/',
-  DELETE_ACCOUNT: '/api/profile/delete-account/'
+  // These endpoints don't exist in your backend - for future reference only
+  GET_PROFILE: '/api/profile/', // Not implemented
+  UPDATE_PROFILE: '/api/profile/', // Not implemented
+  // Future endpoints if you decide to add profile functionality
+  UPLOAD_AVATAR: '/api/profile/avatar/', // Not implemented
+  CHANGE_PASSWORD: '/api/profile/change-password/', // Not implemented
+  DELETE_ACCOUNT: '/api/profile/delete-account/' // Not implemented
 };
 
 /**

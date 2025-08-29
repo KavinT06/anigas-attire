@@ -8,6 +8,7 @@ import useCartStore from '../../../store/cartStore';
 import toast, { Toaster } from 'react-hot-toast';
 import { getAuthHeaders } from '../../../utils/auth';
 import { useWishlist } from '../../../contexts/WishlistContext';
+import { API_BASE_URL, getProductUrl } from '../../../utils/apiConfig';
 
 export default function ProductDetail({ params }) {
     const [product, setProduct] = useState(null);
@@ -31,9 +32,6 @@ export default function ProductDetail({ params }) {
     // Unwrap params Promise using React.use()
     const resolvedParams = React.use(params);
     const productId = resolvedParams.id;
-
-    // Configure your Django backend URL
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5025';
 
     // Get available sizes from product data or fallback to defaults
     const getAvailableSizes = () => {
@@ -140,7 +138,7 @@ export default function ProductDetail({ params }) {
             setIsLoading(true);
             setError('');
 
-            const response = await axios.get(`${API_BASE_URL}/api/ecom/products/${productId}/`, {
+            const response = await axios.get(getProductUrl(productId), {
                 timeout: 10000,
                 headers: getAuthHeaders()
             });
@@ -159,7 +157,7 @@ export default function ProductDetail({ params }) {
                     `Server error (${err.response.status})`;
                 setError(errorMessage);
             } else if (err.request) {
-                setError('Connection failed: Make sure Django server is running on http://localhost:5025');
+                setError('Connection failed: Make sure Django server is running on ' + API_BASE_URL);
             } else {
                 setError(`Error: ${err.message}`);
             }

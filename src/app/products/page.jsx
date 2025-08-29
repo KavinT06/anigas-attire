@@ -1,16 +1,18 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import axios from 'axios';
 import Image from 'next/image';
 import useCartStore from '../../store/cartStore';
 import ToastContainer, { useToast } from '../components/Toast';
 import { getAuthHeaders } from '../../utils/auth';
 import { useWishlist } from '../../contexts/WishlistContext';
+import { API_BASE_URL, ECOM_ENDPOINTS, getCategoryProductsUrl } from '../../utils/apiConfig';
 import logo from "../../assets/logo.jpg";
 
-export default function ProductList() {
+function ProductListContent() {
     const [products, setProducts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
@@ -31,9 +33,6 @@ export default function ProductList() {
         loading: wishlistLoading 
     } = useWishlist();
 
-    // Configure your Django backend URL
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5025';
-
     useEffect(() => {
         fetchProducts();
     }, [categoryId]);
@@ -46,10 +45,10 @@ export default function ProductList() {
             let endpoint;
             if (categoryId) {
                 // Fetch products for specific category
-                endpoint = `${API_BASE_URL}/api/ecom/category-products/${categoryId}/`;
+                endpoint = getCategoryProductsUrl(categoryId);
             } else {
                 // Fetch all products
-                endpoint = `${API_BASE_URL}/api/ecom/products/`;
+                endpoint = ECOM_ENDPOINTS.products;
             }
 
             const response = await axios.get(endpoint, {
@@ -85,7 +84,7 @@ export default function ProductList() {
                     `Server error (${err.response.status})`;
                 setError(errorMessage);
             } else if (err.request) {
-                setError('Connection failed: Make sure Django server is running on http://localhost:5025');
+                setError('Connection failed: Make sure Django server is running on ' + API_BASE_URL);
             } else {
                 setError(`Error: ${err.message}`);
             }
@@ -187,12 +186,12 @@ export default function ProductList() {
                         <nav className="flex mb-4" aria-label="Breadcrumb">
                             <ol className="inline-flex items-center space-x-1 md:space-x-3">
                                 <li className="inline-flex items-center">
-                                    <a href="/" className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-orange-600">
+                                    <Link href="/" className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-orange-600">
                                         <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                             <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
                                         </svg>
                                         Home
-                                    </a>
+                                    </Link>
                                 </li>
                                 <li>
                                     <div className="flex items-center">
@@ -452,5 +451,21 @@ export default function ProductList() {
                 </div>
             </section>
         </div>
+    );
+}
+
+function ProductListFallback() {
+    return (
+        <div className="flex items-center justify-center min-h-screen">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-orange-500"></div>
+        </div>
+    );
+}
+
+export default function ProductList() {
+    return (
+        <Suspense fallback={<ProductListFallback />}>
+            <ProductListContent />
+        </Suspense>
     );
 }

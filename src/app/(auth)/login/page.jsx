@@ -6,6 +6,7 @@ import Cookie from "js-cookie";
 import Link from "next/link";
 import Image from "next/image";
 import Logo from "../../../assets/logo.jpg";
+import { API_BASE_URL, AUTH_ENDPOINTS } from "../../../utils/apiConfig";
 
 const Login = () => {
   const [step, setStep] = useState(1);
@@ -16,9 +17,6 @@ const Login = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const recaptchaRef = useRef(null);
   const inputRefs = useRef([]);
-
-  // Backend API URL
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5025";
 
   const onRecaptchaError = () => {
     setErrorMessage("reCAPTCHA failed to load. Please refresh the page.");
@@ -94,7 +92,7 @@ const Login = () => {
         recaptcha_token: token,
       };
       
-      const response = await fetch(`${API_BASE_URL}/api/auth/send-otp/`, {
+      const response = await fetch(AUTH_ENDPOINTS.sendOtp, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -177,7 +175,7 @@ const Login = () => {
         return;
       }
       
-      const response = await fetch(`${API_BASE_URL}/api/auth/login/`, {
+      const response = await fetch(AUTH_ENDPOINTS.login, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -254,7 +252,7 @@ const Login = () => {
                 />
               </Link>
               <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">
-                Welcome to Aniga's Attire
+                Welcome to Aniga&apos;s Attire
               </h1>
               <p className="text-sm text-gray-500 mt-2">
                 Login with your phone number

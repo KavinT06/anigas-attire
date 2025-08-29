@@ -62,7 +62,7 @@ const Header = () => {
               <Link href="/" className="flex">
                 <Image className="w-auto h-7 xl:h-10 xl:ml-28 rounded-lg" src={logo} alt="" />
               </Link>
-              <p className='text-xl ml-1.5 mt-0.5 font-bold text-black'>Aniga's Attire</p>
+              <p className='text-xl ml-1.5 mt-0.5 font-bold text-black'>Aniga&apos;s Attire</p>
             </div>
             <button type="button" className="inline-flex p-1 text-black transition-all duration-200 border border-black lg:hidden focus:bg-gray-100 hover:bg-gray-100">
               <svg className="block w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -109,7 +109,7 @@ const Header = () => {
             <Link href="/" className="flex">
               <Image className="w-auto h-7 xl:h-10 xl:ml-28 rounded-lg" src={logo} alt="" />
             </Link>
-            <p className='text-xl ml-1.5 mt-0.5 font-bold text-black'>Aniga's Attire</p>
+            <p className='text-xl ml-1.5 mt-0.5 font-bold text-black'>Aniga&apos;s Attire</p>
           </div>
 
           <button 

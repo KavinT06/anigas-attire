@@ -78,12 +78,31 @@ src/
 The application is designed to work with a Django REST API backend. It includes fallback to localStorage for development when the backend is not available.
 
 ### API Endpoints
-- Authentication: `/api/auth/`
+Based on your Django backend structure:
+
+**Authentication Module (`/api/auth/`):**
+- Login: `/api/auth/login/`
+- Refresh Token: `/api/auth/refresh/`
+- Send OTP: `/api/auth/send-otp/`
+
+**E-commerce Module (`/api/ecom/`):**
+- Categories: `/api/ecom/categories/`
 - Products: `/api/ecom/products/`
-- Cart: Client-side with localStorage
-- Wishlist: `/api/wishlist/` (with localStorage fallback)
-- Orders: `/api/orders/`
-- Profile: `/api/profile/`
+- Category Products: `/api/ecom/category-products/`
+- Wishlist: `/api/ecom/wishlist/`
+- Coupon: `/api/ecom/coupon/`
+- Address: `/api/ecom/address/`
+- Cart: `/api/ecom/cart/`
+- Orders: `/api/ecom/orders/`
+- Payment: `/api/ecom/payment/`
+
+**Alternative Authentication (`/api/authentication/`):**
+- Refresh: `/api/authentication/refresh/`
+
+**Profile (Not Available):**
+- Profile endpoints are not implemented in the backend
+- App uses localStorage fallback for profile data
+- User info comes from `/api/auth/me/` when available
 
 ## 🚀 Deployment
 

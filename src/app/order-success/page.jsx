@@ -46,7 +46,7 @@ const OrderSuccessContent = () => {
               Order Placed Successfully! 🎉
             </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Thank you for your order! We've received your purchase and will begin processing it shortly.
+              Thank you for your order! We&apos;ve received your purchase and will begin processing it shortly.
             </p>
           </div>
 
@@ -109,7 +109,7 @@ const OrderSuccessContent = () => {
                 </div>
                 <div>
                   <h3 className="font-medium text-gray-900">Preparation</h3>
-                  <p className="text-sm text-gray-600">We'll carefully package your items for delivery.</p>
+                  <p className="text-sm text-gray-600">We&apos;ll carefully package your items for delivery.</p>
                 </div>
               </div>
               
@@ -174,7 +174,7 @@ const OrderSuccessContent = () => {
           <div className="mt-12 p-6 bg-white rounded-lg shadow-sm max-w-2xl mx-auto">
             <h3 className="font-semibold text-gray-900 mb-3">Need Help?</h3>
             <p className="text-sm text-gray-600 mb-4">
-              If you have any questions about your order or need assistance, please don't hesitate to contact us.
+              If you have any questions about your order or need assistance, please don&apos;t hesitate to contact us.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
@@ -196,7 +196,7 @@ const OrderSuccessContent = () => {
           {/* Thank You Message */}
           <div className="mt-8">
             <p className="text-lg font-medium text-gray-900 mb-2">
-              Thank you for choosing Aniga's Attire! 
+              Thank you for choosing Aniga&apos;s Attire! 
             </p>
             <p className="text-gray-600">
               We appreciate your business and look forward to serving you again.

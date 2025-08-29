@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }) => {
   const [mounted, setMounted] = useState(false);
 
   // Configuration flag for optional user profile endpoint
-  const ENABLE_USER_PROFILE = true; // Set to true when backend has user profile endpoint
+  const ENABLE_USER_PROFILE = false; // Disabled since /api/profile/ doesn't exist in backend
 
   // Check authentication status
   const checkAuthStatus = () => {
@@ -50,39 +50,20 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      const response = await api.get('/api/profile/');
-      setUser(response.data);
+      // Try auth/me endpoint first since /api/profile/ doesn't exist in your backend
+      const authResponse = await api.get('/api/auth/me/');
+      setUser(authResponse.data);
     } catch (error) {
-      // If profile endpoint returns 404, try auth endpoints or use minimal data
-      if (error.response?.status === 404) {
-        try {
-          // Try alternative auth endpoint
-          const authResponse = await api.get('/api/auth/me/');
-          setUser(authResponse.data);
-        } catch (authError) {
-          // Use minimal fallback user data that works with address-only profile
-          setUser({
-            id: 'user-' + Date.now(),
-            name: 'User',
-            phone: null,
-            phone_number: null,
-            mobile: null,
-            email: null,
-            avatar: null
-          });
-        }
-      } else {
-        // For other errors, use fallback data
-        setUser({
-          id: 'user-' + Date.now(),
-          name: 'User',
-          phone: null,
-          phone_number: null,
-          mobile: null,
-          email: null,
-          avatar: null
-        });
-      }
+      // Use minimal fallback user data that works with address-only profile
+      setUser({
+        id: 'user-' + Date.now(),
+        name: 'User',
+        phone: null,
+        phone_number: null,
+        mobile: null,
+        email: null,
+        avatar: null
+      });
     }
   };
 

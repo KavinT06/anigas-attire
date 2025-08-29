@@ -19,12 +19,13 @@ const WishlistPage = () => {
     getWishlistCount
   } = useWishlist();
 
-  // Load wishlist on component mount
+  // Load wishlist on component mount (only if not already initialized and no recent load)
   useEffect(() => {
+    // Only trigger once when the component mounts and user is logged in
     if (isLoggedIn && !initialized) {
       loadWishlist();
     }
-  }, [isLoggedIn, initialized, loadWishlist]);
+  }, []); // Empty dependency array - only run once on mount
 
   // Handle remove from wishlist
   const handleRemoveItem = async (productId, productName) => {

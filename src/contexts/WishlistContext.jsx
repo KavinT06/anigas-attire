@@ -27,36 +27,40 @@ export const WishlistProvider = ({ children }) => {
   const [initialized, setInitialized] = useState(false);
   const [fallbackMode, setFallbackMode] = useState(false);
   const { isLoggedIn } = useAuth();
+  
+  // Request deduplication
+  const [isLoadingWishlist, setIsLoadingWishlist] = useState(false);
+  const [lastLoadTime, setLastLoadTime] = useState(0);
+  
+  // Debounce wishlist loading to prevent excessive API calls
+  const LOAD_DEBOUNCE_TIME = 2000; // 2 seconds
 
-  // Load wishlist when user logs in
+  // Load wishlist when user logs in (debounced)
   useEffect(() => {
+    const now = Date.now();
     if (isLoggedIn && isWishlistAuthValid()) {
-      loadWishlist();
+      // Only load if we haven't loaded recently AND not currently loading
+      if (!isLoadingWishlist && (now - lastLoadTime > LOAD_DEBOUNCE_TIME)) {
+        loadWishlist();
+      }
     } else if (!isLoggedIn) {
       // Clear wishlist when user logs out
       setWishlistItems([]);
       setInitialized(false);
-    }
-  }, [isLoggedIn]);
-
-  // Listen for auth changes
-  useEffect(() => {
-    const handleAuthChange = () => {
-      if (isLoggedIn && isWishlistAuthValid()) {
-        loadWishlist();
-      }
-    };
-
-    if (typeof window !== 'undefined') {
-      window.addEventListener('authChanged', handleAuthChange);
-      return () => window.removeEventListener('authChanged', handleAuthChange);
+      setFallbackMode(false);
     }
   }, [isLoggedIn]);
 
   /**
-   * Load wishlist items from backend
+   * Load wishlist items from backend (with deduplication)
    */
-  const loadWishlist = async (showLoading = true) => {
+  const loadWishlist = async (showLoading = true, force = false) => {
+    // Stronger deduplication - check both loading state AND recent calls
+    const now = Date.now();
+    if (!force && (isLoadingWishlist || (now - lastLoadTime < LOAD_DEBOUNCE_TIME))) {
+      return;
+    }
+
     if (!isWishlistAuthValid()) {
       setWishlistItems([]);
       setInitialized(true);
@@ -64,6 +68,9 @@ export const WishlistProvider = ({ children }) => {
     }
 
     try {
+      // Set loading state IMMEDIATELY to block other concurrent calls
+      setIsLoadingWishlist(true);
+      setLastLoadTime(now);
       if (showLoading) setLoading(true);
       
       const result = await getWishlistItems();
@@ -72,7 +79,7 @@ export const WishlistProvider = ({ children }) => {
         setWishlistItems(result.data || []);
         setFallbackMode(result.fallbackMode || false);
         
-        // Show info about fallback mode
+        // Show info about fallback mode (only once)
         if (result.fallbackMode && !initialized) {
           toast.info('Using offline wishlist mode. Items will sync when backend is ready.', {
             duration: 4000,
@@ -80,19 +87,9 @@ export const WishlistProvider = ({ children }) => {
           });
         }
         
-        // Attempt to migrate local wishlist on first load (only if not in fallback mode)
-        if (!initialized && !result.fallbackMode) {
-          try {
-            await migrateLocalWishlistToBackend();
-            // Reload wishlist after migration
-            const updatedResult = await getWishlistItems();
-            if (updatedResult.success) {
-              setWishlistItems(updatedResult.data || []);
-            }
-          } catch (migrationError) {
-            console.warn('Wishlist migration failed:', migrationError);
-          }
-        }
+        // REMOVED: Migration logic that was causing extra API calls
+        // Migration will only happen manually if needed
+        
       } else {
         console.error('Failed to load wishlist:', result.error);
         
@@ -119,6 +116,7 @@ export const WishlistProvider = ({ children }) => {
     } finally {
       setLoading(false);
       setInitialized(true);
+      setIsLoadingWishlist(false);
     }
   };
 
@@ -168,10 +166,9 @@ export const WishlistProvider = ({ children }) => {
           duration: 2000,
         });
         
-        // Refresh from backend to get correct data (only if not in fallback mode)
-        if (!result.fallbackMode) {
-          setTimeout(() => loadWishlist(false), 500);
-        }
+        // REMOVED: Auto-refresh that was causing excessive API calls
+        // The local state update above is sufficient for UI consistency
+        // Manual refresh can be triggered if needed
         
         return { success: true, data: newItem };
       } else {
@@ -296,6 +293,73 @@ export const WishlistProvider = ({ children }) => {
   };
 
   /**
+   * Manual refresh of wishlist data
+   */
+  const refreshWishlist = async () => {
+    if (!isWishlistAuthValid()) {
+      return { success: false, error: 'Not authenticated' };
+    }
+
+    try {
+      setLoading(true);
+      setIsLoadingWishlist(false); // Reset loading state
+      await loadWishlist(true); // Force reload
+      toast.success('Wishlist refreshed');
+      return { success: true };
+    } catch (error) {
+      console.error('Error refreshing wishlist:', error);
+      toast.error('Failed to refresh wishlist');
+      return { success: false, error: error.message };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * Manual migration of localStorage wishlist to backend
+   */
+  const migrateLocalWishlist = async () => {
+    if (!isWishlistAuthValid()) {
+      return { success: false, error: 'Not authenticated' };
+    }
+
+    try {
+      setLoading(true);
+      const localWishlist = getLocalWishlist();
+      
+      if (!localWishlist.length) {
+        toast.info('No local wishlist to migrate');
+        return { success: true, migrated: 0 };
+      }
+
+      let migrated = 0;
+      for (const item of localWishlist) {
+        try {
+          await addToWishlistAPI(item.id, item);
+          migrated++;
+        } catch (error) {
+          console.error('Failed to migrate item:', item.id, error);
+        }
+      }
+
+      // Clear local storage after successful migration
+      if (migrated > 0) {
+        localStorage.removeItem(STORAGE_KEY);
+        toast.success(`Migrated ${migrated} items to your account`);
+        await loadWishlist(true); // Reload from backend
+      }
+      
+      return { success: true, migrated };
+    } catch (error) {
+      console.error('Error migrating wishlist:', error);
+      toast.error('Failed to migrate wishlist');
+      return { success: false, error: error.message };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
    * Clear entire wishlist (for testing/admin purposes)
    */
   const clearWishlist = async () => {
@@ -338,6 +402,8 @@ export const WishlistProvider = ({ children }) => {
     removeItemFromWishlist,
     toggleWishlistItem,
     clearWishlist,
+    refreshWishlist,
+    migrateLocalWishlist,
     
     // Utilities
     isInWishlist,

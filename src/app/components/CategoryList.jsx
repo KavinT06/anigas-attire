@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import Image from 'next/image';
 import { getAuthHeaders } from '../../utils/auth';
+import { API_BASE_URL, ECOM_ENDPOINTS } from '../../utils/apiConfig';
 import logo from "../../assets/logo.jpg";
 
 export default function CategoryList() {
@@ -12,9 +13,6 @@ export default function CategoryList() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
     const router = useRouter();
-
-    // Configure your Django backend URL
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5025';
 
     useEffect(() => {
         fetchCategories();
@@ -25,7 +23,7 @@ export default function CategoryList() {
             setIsLoading(true);
             setError('');
 
-            const response = await axios.get(`${API_BASE_URL}/api/ecom/categories/`, {
+            const response = await axios.get(ECOM_ENDPOINTS.categories, {
                 timeout: 10000,
                 headers: getAuthHeaders()
             });
@@ -44,7 +42,7 @@ export default function CategoryList() {
                     `Server error (${err.response.status})`;
                 setError(errorMessage);
             } else if (err.request) {
-                setError('Connection failed: Make sure Django server is running on http://localhost:5025');
+                setError('Connection failed: Make sure Django server is running on ' + API_BASE_URL);
             } else {
                 setError(`Error: ${err.message}`);
             }
@@ -83,7 +81,7 @@ export default function CategoryList() {
                             Shop by Category
                         </h1>
                         <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
-                            Discover our wide range of premium fashion categories. Find exactly what you're looking for.
+                            Discover our wide range of premium fashion categories. Find exactly what you&apos;re looking for.
                         </p>
                     </div>
 

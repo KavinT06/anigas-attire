@@ -8,6 +8,23 @@
 			"group": "build",
 			"isBackground": true,
 			"problemMatcher": []
+		},
+		{
+			"label": "Production Build",
+			"type": "shell",
+			"command": "npm run build",
+			"group": "build",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Start Production Server",
+			"type": "shell",
+			"command": "npm start",
+			"group": "build",
+			"isBackground": true,
+			"problemMatcher": [],
+			"dependsOn": "Production Build"
 		}
 	]
 }

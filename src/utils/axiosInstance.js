@@ -1,8 +1,8 @@
 import axios from "axios";
 import Cookie from "js-cookie";
+import { API_BASE_URL, AUTH_ENDPOINTS } from "./apiConfig";
 
 // Configuration constants
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5025";
 const REFRESH_ENDPOINT = "/api/auth/refresh/";
 
 // Cookie configuration
@@ -184,6 +184,12 @@ const createApiInstance = (cookieStore = null) => {
   // Request interceptor
   instance.interceptors.request.use(
     (config) => {
+      // Block any requests to /api/profile/ endpoints
+      if (config.url && config.url.includes('/api/profile/')) {
+        console.error('BLOCKED: Attempted request to /api/profile/ endpoint which does not exist');
+        return Promise.reject(new Error('Profile endpoint is not available in backend. Use localStorage fallback.'));
+      }
+      
       const token = getToken(cookieStore);
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;

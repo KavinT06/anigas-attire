@@ -62,3 +62,13 @@ debug-*.html
 test-*.js
 *-test.js
 *.test.local.*
+
+# Development documentation files
+BACKEND_ENDPOINTS_UPDATE_SUMMARY.md
+CLEANUP_SUMMARY.md
+COMPLETE_PROFILE_ENDPOINT_FIX.md
+PROFILE_ENDPOINT_FIX.md
+
+# Cleanup scripts
+cleanup.sh
+cleanup.bat
