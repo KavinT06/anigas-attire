@@ -6,6 +6,7 @@ A modern e-commerce frontend built with Next.js, featuring user authentication, 
 
 - **User Authentication**: Secure login/logout with JWT tokens
 - **Product Catalog**: Browse products by categories with search and filtering
+- **Quick Buy Modal**: Instant product purchase with variant selection
 - **Shopping Cart**: Add items to cart, manage quantities, and proceed to checkout
 - **Wishlist**: Save products for later with persistent storage
 - **Order Management**: Place orders and view order history
@@ -19,15 +20,154 @@ A modern e-commerce frontend built with Next.js, featuring user authentication, 
 - **Styling**: Tailwind CSS
 - **State Management**: Zustand for cart, React Context for auth and wishlist
 - **HTTP Client**: Axios with custom instance
-- **UI Components**: Custom components with Heroicons
+- **UI Components**: Custom components with beautiful gradients and animations
 - **Authentication**: JWT with cookies
-- **Notifications**: React Hot Toast
+- **Notifications**: Custom toast notifications
 
 ## 📦 Installation
 
 1. **Clone the repository**:
 ```bash
-git clone <repository-url>
+git clone https://github.com/KavinT06/anigas-attire.git
+cd anigas-attire
+```
+
+2. **Install dependencies**:
+```bash
+npm install
+```
+
+3. **Environment Setup**:
+Create a `.env.local` file in the root directory:
+```env
+NEXT_PUBLIC_API_BASE_URL=your_backend_api_url
+```
+
+4. **Run the development server**:
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) to view the application.
+
+## 🏗 Project Structure
+
+```
+src/
+├── app/
+│   ├── (auth)/login/          # Authentication pages
+│   ├── account/orders/        # Order history
+│   ├── cart/                  # Shopping cart
+│   ├── categories/            # Product categories
+│   ├── checkout/              # Checkout process
+│   ├── components/            # Shared UI components
+│   │   ├── Header.jsx         # Navigation header
+│   │   ├── Hero.jsx           # Homepage hero section
+│   │   ├── CategoryList.jsx   # Product categories
+│   │   ├── QuickBuyModal.jsx  # Quick purchase modal
+│   │   └── Toast.jsx          # Notification system
+│   ├── order/[id]/           # Order details
+│   ├── order-success/        # Order confirmation
+│   ├── product/[id]/         # Product details
+│   ├── products/             # Product listing
+│   ├── profile/              # User profile
+│   └── wishlist/             # User wishlist
+├── assets/                   # Static images
+├── components/               # Global components
+│   └── ProtectedRoute.jsx    # Authentication wrapper
+├── contexts/                 # React contexts
+│   ├── AuthContext.jsx       # Authentication state
+│   └── WishlistContext.jsx   # Wishlist state
+├── hooks/                    # Custom React hooks
+│   └── useProfile.js         # Profile management
+├── store/                    # State management
+│   └── cartStore.js          # Cart state (Zustand)
+└── utils/                    # Utility functions
+    ├── apiConfig.js          # API configuration
+    ├── auth.js               # Authentication helpers
+    ├── axiosInstance.js      # HTTP client setup
+    ├── profileApi.js         # Profile API calls
+    └── wishlistApi.js        # Wishlist API calls
+```
+
+## 🎨 Key Features
+
+### Quick Buy Modal
+- Instant product purchase without page navigation
+- Beautiful gradient buttons with hover effects
+- Variant selection (sizes) with validation
+- Quantity controls and immediate cart addition
+
+### Authentication System
+- Protected routes with automatic redirection
+- JWT token management with secure storage
+- Profile completion tracking and banners
+
+### Shopping Experience
+- Real-time cart updates across the application
+- Wishlist with heart animations
+- Product search and category filtering
+- Responsive product cards with hover effects
+
+## 🚀 Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm start` - Start production server
+- `npm run lint` - Run ESLint
+
+## 🔧 Configuration
+
+The application uses several configuration files:
+
+- `next.config.mjs` - Next.js configuration
+- `tailwind.config.js` - Tailwind CSS configuration
+- `postcss.config.mjs` - PostCSS configuration
+- `jsconfig.json` - JavaScript/TypeScript paths
+
+## 🌐 API Integration
+
+The frontend integrates with a backend API for:
+
+- User authentication and profile management
+- Product catalog and inventory
+- Shopping cart and order processing
+- Wishlist management
+
+API endpoints are configured in `src/utils/apiConfig.js`.
+
+## 📱 Responsive Design
+
+Built with mobile-first approach using Tailwind CSS:
+
+- Responsive navigation with mobile menu
+- Adaptive product grids
+- Touch-friendly buttons and interactions
+- Optimized images with Next.js Image component
+
+## 🎯 Performance Features
+
+- **Next.js App Router** for optimal performance
+- **Image Optimization** with Next.js Image component
+- **Code Splitting** with dynamic imports
+- **Lazy Loading** for product images
+- **Client-side State Management** for smooth interactions
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📞 Support
+
+For support, email support@anigasattire.com or create an issue in the repository.
 cd anigas-attire
 ```
 

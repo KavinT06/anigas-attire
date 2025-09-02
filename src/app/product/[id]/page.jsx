@@ -133,6 +133,54 @@ export default function ProductDetail({ params }) {
         }
     };
 
+    // Handle quick buy
+    const handleQuickBuy = async () => {
+        if (!product) {
+            toast.error('Product not found');
+            return;
+        }
+
+        if (!selectedSize) {
+            toast.error('Please select a size');
+            return;
+        }
+
+        setIsQuickBuying(true);
+        
+        try {
+            // Add to cart first
+            addToCart(product, selectedSize, quantity);
+            
+            // Trigger storage event for header to update
+            window.dispatchEvent(new Event('cartUpdated'));
+            
+            // Show success message and redirect to checkout
+            toast.success(
+                `Added ${quantity} ${product.name} (${selectedSize}) to cart! Redirecting to checkout...`,
+                {
+                    duration: 2000,
+                    position: 'top-center',
+                    icon: '⚡',
+                    style: {
+                        background: '#f97316',
+                        color: 'white',
+                    },
+                }
+            );
+            
+            // Redirect to checkout after a short delay
+            setTimeout(() => {
+                router.push('/checkout');
+            }, 1500);
+            
+        } catch (error) {
+            console.error('Error during quick buy:', error);
+            toast.error('Failed to process quick buy. Please try again.');
+        } finally {
+            setIsQuickBuying(false);
+        }
+    };
+
     const fetchProduct = async () => {
         try {
             setIsLoading(true);
@@ -334,7 +382,7 @@ export default function ProductDetail({ params }) {
                                 </div>
                             </div>
 
-                            {/* Add to Cart Button */}
+                            {/* Action Buttons */}
                             <div className="space-y-4 pt-4">
                                 <button 
                                     className={`w-full py-4 px-6 rounded-lg font-semibold text-lg transition-colors duration-200 ${

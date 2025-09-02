@@ -7,6 +7,7 @@ import axios from 'axios';
 import Image from 'next/image';
 import useCartStore from '../../store/cartStore';
 import ToastContainer, { useToast } from '../components/Toast';
+import QuickBuyModal from '../components/QuickBuyModal';
 import { getAuthHeaders } from '../../utils/auth';
 import { useWishlist } from '../../contexts/WishlistContext';
 import { API_BASE_URL, ECOM_ENDPOINTS, getCategoryProductsUrl } from '../../utils/apiConfig';
@@ -18,12 +19,13 @@ function ProductListContent() {
     const [error, setError] = useState('');
     const [categoryName, setCategoryName] = useState('');
     const [expandedDescriptions, setExpandedDescriptions] = useState(new Set());
+    const [quickBuyProduct, setQuickBuyProduct] = useState(null);
+    const [isQuickBuyModalOpen, setIsQuickBuyModalOpen] = useState(false);
     const router = useRouter();
     const searchParams = useSearchParams();
     const categoryId = searchParams.get('category');
 
-    // Use cart store and toast
-    const { addToCart } = useCartStore();
+    // Use toast
     const { toasts, removeToast, toast } = useToast();
     
     // Use wishlist context
@@ -98,18 +100,17 @@ function ProductListContent() {
         router.push(`/product/${productId}`);
     };
 
-    const handleAddToCart = (product, e) => {
+    const handleQuickBuy = (product, e) => {
         e.stopPropagation();
         
-        // For products page, we'll add with a default medium size
-        const defaultSize = 'M';
-        
-        addToCart(product, defaultSize, 1);
-        
-        toast.success(`Added ${product.name} to cart!`);
-        
-        // Dispatch custom event to update header cart count
-        window.dispatchEvent(new Event('cartUpdated'));
+        // Open the Quick Buy modal with the selected product
+        setQuickBuyProduct(product);
+        setIsQuickBuyModalOpen(true);
+    };
+
+    const closeQuickBuyModal = () => {
+        setIsQuickBuyModalOpen(false);
+        setQuickBuyProduct(null);
     };
 
     // Handle wishlist toggle
@@ -382,10 +383,15 @@ function ProductListContent() {
                                         {/* Action Buttons */}
                                         <div className="flex gap-2">
                                             <button
-                                                onClick={(e) => handleAddToCart(product, e)}
-                                                className="flex-1 rounded-sm bg-gray-900 px-3 py-2 text-sm font-medium text-white transition hover:scale-105 hover:bg-gray-800"
+                                                onClick={(e) => handleQuickBuy(product, e)}
+                                                className="flex-1 rounded-lg bg-gradient-to-r from-green-500 to-green-600 px-4 py-3 text-sm font-semibold text-white shadow-lg hover:bg-green-700 hover:bg-none transition-colors duration-300"
                                             >
-                                                Add to Cart
+                                                <span className="flex items-center justify-center gap-2">
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                                    </svg>
+                                                    Quick Buy
+                                                </span>
                                             </button>
                                             <button
                                                 onClick={(e) => handleWishlistToggle(product, e)}
@@ -450,6 +456,14 @@ function ProductListContent() {
                     )}
                 </div>
             </section>
+
+            {/* Quick Buy Modal */}
+            <QuickBuyModal
+                product={quickBuyProduct}
+                isOpen={isQuickBuyModalOpen}
+                onClose={closeQuickBuyModal}
+                toast={toast}
+            />
         </div>
     );
 }
