@@ -30,4 +30,11 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  padding-top: 4rem; /* Add padding for fixed header (64px for h-16) */
+}
+
+@media (min-width: 1024px) {
+  body {
+    padding-top: 5rem; /* 80px for lg:h-20 on larger screens */
+  }
 }
