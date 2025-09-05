@@ -6,11 +6,13 @@ import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import ProtectedRoute from '../../../components/ProtectedRoute';
 import { getOrderById } from '../../../services/api/orders';
+import { fetchAddresses } from '../../../services/api/addresses';
 
 const OrderDetailsPage = () => {
     const params = useParams();
     const router = useRouter();
     const [order, setOrder] = useState(null);
+    const [shippingAddress, setShippingAddress] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -30,7 +32,27 @@ const OrderDetailsPage = () => {
             const result = await getOrderById(orderId);
             
             if (result.success) {
+                console.log('Order data received:', result.data);
+                console.log('Address data:', result.data.shipping_address || result.data.address || result.data.delivery_address);
                 setOrder(result.data);
+                
+                // Check if we need to fetch address details separately
+                if (result.data.address_id && !result.data.shipping_address && !result.data.address) {
+                    try {
+                        console.log('Fetching address details for address_id:', result.data.address_id);
+                        const addressResult = await fetchAddresses();
+                        if (addressResult.data && Array.isArray(addressResult.data)) {
+                            const matchingAddress = addressResult.data.find(addr => addr.id === result.data.address_id);
+                            if (matchingAddress) {
+                                console.log('Found matching address:', matchingAddress);
+                                setShippingAddress(matchingAddress);
+                            }
+                        }
+                    } catch (addressError) {
+                        console.error('Error fetching address details:', addressError);
+                        // Don't fail the whole page if address fetch fails
+                    }
+                }
             } else {
                 setError(result.error?.message || 'Failed to fetch order details');
                 if (result.error?.status === 404) {
@@ -342,37 +364,62 @@ const OrderDetailsPage = () => {
                     </div>
 
                     {/* Shipping Address */}
-                    {(order.shipping_address || order.address) && (
+                    {(order.shipping_address || order.address || order.delivery_address || shippingAddress) && (
                         <div className="bg-white rounded-lg shadow p-6 mb-6">
                             <h2 className="text-xl font-semibold text-gray-900 mb-4">Shipping Address</h2>
                             <div className="text-gray-600">
-                                {typeof (order.shipping_address || order.address) === 'string' ? (
-                                    <p>{order.shipping_address || order.address}</p>
-                                ) : (
-                                    <div className="space-y-1">
-                                        {(order.shipping_address || order.address).name && (
-                                            <p className="font-medium text-gray-900">
-                                                {(order.shipping_address || order.address).name}
-                                            </p>
-                                        )}
-                                        {(order.shipping_address || order.address).street && (
-                                            <p>{(order.shipping_address || order.address).street}</p>
-                                        )}
-                                        {(order.shipping_address || order.address).city && (
-                                            <p>
-                                                {(order.shipping_address || order.address).city}
-                                                {(order.shipping_address || order.address).state && 
-                                                    `, ${(order.shipping_address || order.address).state}`}
-                                                {(order.shipping_address || order.address).postal_code && 
-                                                    ` ${(order.shipping_address || order.address).postal_code}`}
-                                            </p>
-                                        )}
-                                        {(order.shipping_address || order.address).phone && (
-                                            <p>Phone: {(order.shipping_address || order.address).phone}</p>
-                                        )}
-                                    </div>
-                                )}
+                                {(() => {
+                                    const address = order.shipping_address || order.address || order.delivery_address || shippingAddress;
+                                    
+                                    // Handle string address
+                                    if (typeof address === 'string') {
+                                        return <p className="whitespace-pre-line">{address}</p>;
+                                    }
+                                    
+                                    // Handle object address
+                                    if (typeof address === 'object' && address !== null) {
+                                        return (
+                                            <div className="space-y-1">
+                                                {address.name && (
+                                                    <p className="font-medium text-gray-900">
+                                                        {address.name}
+                                                    </p>
+                                                )}
+                                                {address.address && (
+                                                    <p>{address.address}</p>
+                                                )}
+                                                {(address.city || address.state || address.pincode) && (
+                                                    <p>
+                                                        {address.city}
+                                                        {address.state && `, ${address.state}`}
+                                                        {address.pincode && ` - ${address.pincode}`}
+                                                    </p>
+                                                )}
+                                                {address.country && (
+                                                    <p>{address.country}</p>
+                                                )}
+                                                {(address.phone_number || address.phone) && (
+                                                    <p>Phone: {address.phone_number || address.phone}</p>
+                                                )}
+                                            </div>
+                                        );
+                                    }
+                                    
+                                    return <p className="text-gray-500 italic">Address information not available</p>;
+                                })()}
                             </div>
+                        </div>
+                    )}
+
+                    {/* Show address ID for debugging if no address details found */}
+                    {!order.shipping_address && !order.address && !order.delivery_address && !shippingAddress && order.address_id && (
+                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                            <h3 className="text-sm font-medium text-yellow-800 mb-1">
+                                Address Information
+                            </h3>
+                            <p className="text-sm text-yellow-700">
+                                Address ID: {order.address_id} (Full address details could not be loaded)
+                            </p>
                         </div>
                     )}
 

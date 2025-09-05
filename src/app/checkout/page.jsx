@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import Image from 'next/image';
 import useCartStore from '../../store/cartStore';
 import ToastContainer, { useToast } from '../components/Toast';
@@ -13,10 +14,13 @@ import {
   getCart, 
   addToCart,
   removeFromCart,
-  getAddresses, 
-  createAddress,
   initiatePayment 
 } from '../../services/api/orders';
+import { 
+  fetchAddresses, 
+  createAddress as createNewAddress,
+  deleteAddress 
+} from '../../services/api/addresses';
 import api from '../../utils/axiosInstance';
 import { ECOM_ENDPOINTS } from '../../utils/apiConfig';
 
@@ -31,10 +35,10 @@ const CheckoutPage = () => {
   const [selectedAddressId, setSelectedAddressId] = useState('');
   const [newAddress, setNewAddress] = useState({
     name: '',
-    street: '',
+    address: '',
     city: '',
     state: '',
-    postal_code: '',
+    pincode: '',
     phone: ''
   });
   const [showNewAddressForm, setShowNewAddressForm] = useState(false);
@@ -44,6 +48,8 @@ const CheckoutPage = () => {
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const [loadingAddresses, setLoadingAddresses] = useState(true);
+  const [deletingAddressId, setDeletingAddressId] = useState(null);
+  const [isAddingAddress, setIsAddingAddress] = useState(false);
 
   // Load profile data and addresses on mount
   useEffect(() => {
@@ -66,23 +72,19 @@ const CheckoutPage = () => {
   const loadAddresses = async () => {
     setLoadingAddresses(true);
     try {
-      const result = await getAddresses();
-      if (result.success) {
-        const addressList = result.data.results || result.data || [];
-        setAddresses(addressList);
-        // Auto-select first address if available
-        if (addressList.length > 0 && !selectedAddressId) {
-          setSelectedAddressId(addressList[0].id);
-        }
-      } else {
-        console.error('Failed to load addresses:', result.error);
-        // Don't show error toast for empty addresses
-        if (result.error?.status !== 404) {
-          toast.error('Failed to load addresses');
-        }
+      const result = await fetchAddresses();
+      const addressList = result.data || [];
+      setAddresses(addressList);
+      // Auto-select first address if available
+      if (addressList.length > 0 && !selectedAddressId) {
+        setSelectedAddressId(addressList[0].id);
       }
     } catch (error) {
-      console.error('Error loading addresses:', error);
+      console.error('Failed to load addresses:', error);
+      // Don't show error toast for empty addresses list
+      if (error.response?.status !== 404) {
+        toast.error('Failed to load addresses');
+      }
     } finally {
       setLoadingAddresses(false);
     }
@@ -98,8 +100,8 @@ const CheckoutPage = () => {
     if (!newAddress.name.trim()) {
       errors.name = 'Name is required';
     }
-    if (!newAddress.street.trim()) {
-      errors.street = 'Street address is required';
+    if (!newAddress.address.trim()) {
+      errors.address = 'Street address is required';
     }
     if (!newAddress.city.trim()) {
       errors.city = 'City is required';
@@ -107,8 +109,8 @@ const CheckoutPage = () => {
     if (!newAddress.state.trim()) {
       errors.state = 'State is required';
     }
-    if (!newAddress.postal_code.trim()) {
-      errors.postal_code = 'Postal code is required';
+    if (!newAddress.pincode.trim()) {
+      errors.pincode = 'Postal code is required';
     }
     if (!newAddress.phone.trim()) {
       errors.phone = 'Phone number is required';
@@ -135,34 +137,135 @@ const CheckoutPage = () => {
     return Object.keys(errors).length === 0;
   };
 
+  const resetNewAddressForm = () => {
+    setNewAddress({
+      name: '',
+      address: '',
+      city: '',
+      state: '',
+      pincode: '',
+      phone: ''
+    });
+    setFormErrors({});
+    setShowNewAddressForm(false);
+  };
+
   const handleAddNewAddress = async () => {
     if (!validateNewAddress()) {
       toast.error('Please fix the address form errors');
       return;
     }
 
+    // Prevent duplicate submissions
+    if (isAddingAddress) {
+      return;
+    }
+
+    setIsAddingAddress(true);
+
     try {
-      const result = await createAddress(newAddress);
-      if (result.success) {
+      const addressData = {
+        name: newAddress.name.trim(),
+        phone_number: newAddress.phone.trim(),
+        address: newAddress.address.trim(),
+        city: newAddress.city.trim(),
+        state: newAddress.state.trim(),
+        pincode: newAddress.pincode.trim(),
+        country: 'India' // Default country
+      };
+      
+      console.log('Creating address with data:', addressData);
+      
+      const result = await createNewAddress(addressData);
+      console.log('Address API response:', result);
+      
+      // Handle both direct data response and nested data response
+      const addressData_response = result.data || result;
+      
+      if (addressData_response) {
         toast.success('Address added successfully');
-        setAddresses(prev => [...prev, result.data]);
-        setSelectedAddressId(result.data.id);
-        setShowNewAddressForm(false);
-        setNewAddress({
-          name: '',
-          street: '',
-          city: '',
-          state: '',
-          postal_code: '',
-          phone: ''
+        
+        // Update addresses state with the new address
+        setAddresses(prev => {
+          const updatedAddresses = [...prev, addressData_response];
+          console.log('Updated addresses list:', updatedAddresses);
+          return updatedAddresses;
         });
-        setFormErrors({});
+        
+        // Select the newly created address
+        setSelectedAddressId(addressData_response.id);
+        
+        // Reset form using helper function
+        resetNewAddressForm();
+        
+        // Force a refresh of the addresses list to ensure consistency
+        setTimeout(() => {
+          loadAddresses();
+        }, 1000);
       } else {
-        toast.error(result.error?.message || 'Failed to add address');
+        throw new Error('Invalid response from server - no address data received');
       }
     } catch (error) {
-      toast.error('Error adding address');
       console.error('Error adding address:', error);
+      
+      // More detailed error handling
+      let errorMessage = 'Failed to add address';
+      
+      if (error?.response?.data?.detail) {
+        errorMessage = error.response.data.detail;
+      } else if (error?.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error?.response?.data) {
+        // Handle field-specific errors
+        const errorData = error.response.data;
+        const fieldErrors = [];
+        
+        Object.keys(errorData).forEach(field => {
+          if (Array.isArray(errorData[field])) {
+            fieldErrors.push(`${field}: ${errorData[field].join(', ')}`);
+          } else if (typeof errorData[field] === 'string') {
+            fieldErrors.push(`${field}: ${errorData[field]}`);
+          }
+        });
+        
+        if (fieldErrors.length > 0) {
+          errorMessage = fieldErrors.join('\n');
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      toast.error(errorMessage);
+    } finally {
+      setIsAddingAddress(false);
+    }
+  };
+
+  const handleDeleteAddress = async (addressId) => {
+    if (!confirm('Are you sure you want to delete this address?')) {
+      return;
+    }
+    
+    setDeletingAddressId(addressId);
+    try {
+      await deleteAddress(addressId);
+      toast.success('Address deleted successfully');
+      setAddresses(prev => prev.filter(addr => addr.id !== addressId));
+      
+      // If deleted address was selected, clear selection
+      if (selectedAddressId === addressId) {
+        setSelectedAddressId('');
+        // Auto-select first remaining address if any
+        const remainingAddresses = addresses.filter(addr => addr.id !== addressId);
+        if (remainingAddresses.length > 0) {
+          setSelectedAddressId(remainingAddresses[0].id);
+        }
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.detail || 'Failed to delete address');
+      console.error('Error deleting address:', error);
+    } finally {
+      setDeletingAddressId(null);
     }
   };
 
@@ -267,12 +370,18 @@ const CheckoutPage = () => {
       // Step 2: Create address if needed
       let addressId = selectedAddressId;
       if (showNewAddressForm && !selectedAddressId) {
-        const addressResult = await createAddress(newAddress);
-        if (addressResult.success) {
-          addressId = addressResult.data.id;
-        } else {
-          throw new Error('Failed to create address');
-        }
+        const addressData = {
+          name: newAddress.name,
+          phone_number: newAddress.phone,
+          address: newAddress.address,
+          city: newAddress.city,
+          state: newAddress.state,
+          pincode: newAddress.pincode,
+          country: 'India' // Default country
+        };
+        
+        const addressResult = await createNewAddress(addressData);
+        addressId = addressResult.data.id;
       }
 
       // Step 3: Prepare order payload according to backend requirements
@@ -462,7 +571,15 @@ const CheckoutPage = () => {
 
             {/* Delivery Address */}
             <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-              <h2 className="text-lg font-medium text-gray-900 mb-4">Delivery Address</h2>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-medium text-gray-900">Delivery Address</h2>
+                <Link
+                  href="/addresses"
+                  className="text-sm text-blue-600 hover:text-blue-800 underline"
+                >
+                  Manage Addresses
+                </Link>
+              </div>
               
               {loadingAddresses ? (
                 <div className="animate-pulse space-y-3">
@@ -471,11 +588,24 @@ const CheckoutPage = () => {
                 </div>
               ) : (
                 <>
-                  {/* Existing Addresses */}
-                  {addresses.length > 0 && (
+                  {/* Empty state when no addresses */}
+                  {addresses.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500">
+                      <p className="mb-4">No saved addresses found.</p>
+                      <Link
+                        href="/addresses/new"
+                        className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                      >
+                        Add Your First Address
+                      </Link>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Existing Addresses */}
+                      {addresses.length > 0 && (
                     <div className="space-y-3 mb-4">
                       {addresses.map((address) => (
-                        <div key={address.id} className="flex items-start space-x-3">
+                        <div key={address.id} className="flex items-start space-x-3 p-3 border border-gray-200 rounded-lg">
                           <input
                             type="radio"
                             id={`address-${address.id}`}
@@ -494,15 +624,38 @@ const CheckoutPage = () => {
                           >
                             <div className="font-medium text-gray-900">{address.name}</div>
                             <div className="text-gray-600">
-                              {address.street}, {address.city}, {address.state} {address.postal_code}
+                              {address.address}, {address.city}, {address.state} {address.pincode}
                             </div>
-                            {address.phone && (
-                              <div className="text-gray-500">Phone: {address.phone}</div>
+                            {address.phone_number && (
+                              <div className="text-gray-500">Phone: {address.phone_number}</div>
+                            )}
+                            {address.country && (
+                              <div className="text-gray-500">Country: {address.country}</div>
                             )}
                           </label>
+                          
+                          {/* Edit and Delete buttons */}
+                          <div className="flex flex-col gap-1">
+                            <Link
+                              href={`/addresses/${address.id}/edit`}
+                              className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors text-center"
+                            >
+                              Edit
+                            </Link>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteAddress(address.id)}
+                              disabled={deletingAddressId === address.id}
+                              className="px-2 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors disabled:opacity-50"
+                            >
+                              {deletingAddressId === address.id ? 'Deleting...' : 'Delete'}
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>
+                  )}
+                    </>
                   )}
 
                   {/* Add New Address Option */}
@@ -563,16 +716,16 @@ const CheckoutPage = () => {
                       <div>
                         <label className="block text-sm font-medium text-gray-700">Street Address *</label>
                         <textarea
-                          value={newAddress.street}
-                          onChange={(e) => setNewAddress(prev => ({ ...prev, street: e.target.value }))}
+                          value={newAddress.address}
+                          onChange={(e) => setNewAddress(prev => ({ ...prev, address: e.target.value }))}
                           rows={2}
                           className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 ${
-                            formErrors.street ? 'border-red-300' : 'border-gray-300'
+                            formErrors.address ? 'border-red-300' : 'border-gray-300'
                           }`}
                           placeholder="Street address, apartment, suite, etc."
                         />
-                        {formErrors.street && (
-                          <p className="mt-1 text-sm text-red-600">{formErrors.street}</p>
+                        {formErrors.address && (
+                          <p className="mt-1 text-sm text-red-600">{formErrors.address}</p>
                         )}
                       </div>
 
@@ -611,24 +764,36 @@ const CheckoutPage = () => {
                           <label className="block text-sm font-medium text-gray-700">Postal Code *</label>
                           <input
                             type="text"
-                            value={newAddress.postal_code}
-                            onChange={(e) => setNewAddress(prev => ({ ...prev, postal_code: e.target.value }))}
+                            value={newAddress.pincode}
+                            onChange={(e) => setNewAddress(prev => ({ ...prev, pincode: e.target.value }))}
                             className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 ${
-                              formErrors.postal_code ? 'border-red-300' : 'border-gray-300'
+                              formErrors.pincode ? 'border-red-300' : 'border-gray-300'
                             }`}
                             placeholder="Postal code"
                           />
-                          {formErrors.postal_code && (
-                            <p className="mt-1 text-sm text-red-600">{formErrors.postal_code}</p>
+                          {formErrors.pincode && (
+                            <p className="mt-1 text-sm text-red-600">{formErrors.pincode}</p>
                           )}
                         </div>
                       </div>
 
                       <button
                         onClick={handleAddNewAddress}
-                        className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
+                        disabled={isAddingAddress}
+                        className={`px-4 py-2 rounded-md transition-colors ${
+                          isAddingAddress 
+                            ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
+                            : 'bg-orange-600 text-white hover:bg-orange-700'
+                        }`}
                       >
-                        Save Address
+                        {isAddingAddress ? (
+                          <div className="flex items-center">
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                            Saving...
+                          </div>
+                        ) : (
+                          'Save Address'
+                        )}
                       </button>
                     </div>
                   )}

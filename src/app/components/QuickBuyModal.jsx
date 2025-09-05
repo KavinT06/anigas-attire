@@ -225,10 +225,10 @@ const QuickBuyModal = ({ product, isOpen, onClose, toast }) => {
             <button
               onClick={handleAddToCart}
               disabled={isAddingToCart || !selectedSize}
-              className={`flex-1 rounded-lg font-semibold text-sm shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ${
+              className={`flex-1 rounded-lg font-semibold text-sm shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1e2939] ${
                 isAddingToCart || !selectedSize
                   ? 'bg-gray-400 text-white cursor-not-allowed'
-                  : 'bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700'
+                  : 'bg-[#1e2939] text-white hover:bg-[#141a26]'
               }`}
             >
               <span className="flex items-center justify-center px-4 py-2">
