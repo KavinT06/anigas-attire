@@ -83,7 +83,11 @@ const useCartStore = create(
     }),
     {
       name: 'anigas-cart-storage', // localStorage key
-      getStorage: () => localStorage, // use localStorage
+      getStorage: () => (typeof window !== 'undefined' ? localStorage : {
+        getItem: () => null,
+        setItem: () => {},
+        removeItem: () => {},
+      }),
     }
   )
 );

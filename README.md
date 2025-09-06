@@ -11,7 +11,6 @@ A modern e-commerce frontend built with Next.js, featuring user authentication, 
 - **Wishlist**: Save products for later with persistent storage
 - **Order Management**: Complete order lifecycle - place orders, view history, track status
 - **Checkout Process**: Comprehensive checkout with address management and multiple payment methods
-- **Profile Management**: Update user profile information with completion tracking
 - **Responsive Design**: Optimized for mobile and desktop devices
 - **Real-time Updates**: Dynamic cart and wishlist counters
 
@@ -72,7 +71,6 @@ src/
 │   │   └── Toast.jsx          # Notification system
 │   ├── product/[id]/          # Product details
 │   ├── products/              # Product listing
-│   ├── profile/               # User profile
 │   └── wishlist/              # User wishlist
 ├── components/                # Global components
 │   └── ProtectedRoute.jsx     # Authentication wrapper
@@ -80,7 +78,6 @@ src/
 │   ├── AuthContext.jsx        # Authentication state
 │   └── WishlistContext.jsx    # Wishlist state
 ├── hooks/                     # Custom React hooks
-│   └── useProfile.js          # Profile management
 ├── services/                  # API services
 │   └── api/
 │       └── orders.js          # Complete orders API layer
@@ -90,7 +87,6 @@ src/
     ├── apiConfig.js           # API configuration
     ├── auth.js                # Authentication helpers
     ├── axiosInstance.js       # HTTP client setup
-    ├── profileApi.js          # Profile API calls
     └── wishlistApi.js         # Wishlist API calls
 ```
 

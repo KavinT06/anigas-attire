@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 
 import { fetchAddresses, deleteAddress } from "../../services/api/addresses";
 import Link from "next/link";
-import AddressesProtectedRoute from "./ProtectedRoute";
+import ProtectedRoute from "../../components/ProtectedRoute";
 
 function LoadingSkeleton() {
   return (
@@ -91,7 +91,7 @@ export default function AddressesPage() {
   };
 
   return (
-    <AddressesProtectedRoute>
+    <ProtectedRoute>
       <main className="max-w-2xl mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold mb-6">My Addresses</h1>
         {error && <ErrorBanner message={error} onRetry={loadAddresses} />}
@@ -136,6 +136,6 @@ export default function AddressesPage() {
         </div>
         <ConfirmModal open={showConfirm} onClose={closeDeleteModal} onConfirm={handleDelete} />
       </main>
-    </AddressesProtectedRoute>
+    </ProtectedRoute>
   );
 }

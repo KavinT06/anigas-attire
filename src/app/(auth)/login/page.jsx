@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { PhoneIcon } from "@heroicons/react/24/outline";
 import ReCAPTCHA from "react-google-recaptcha";
 import Cookie from "js-cookie";
@@ -200,7 +200,7 @@ const Login = () => {
             Cookie.set("refreshToken", refreshToken, { expires: 7 });
           }
           
-          // Store phone number for profile use (since backend profile endpoint might not exist)
+          // Store phone number for future use
           localStorage.setItem('userPhone', phone_number);
           
           // Dispatch custom event to notify header about auth change

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -32,19 +32,15 @@ const OrderDetailsPage = () => {
             const result = await getOrderById(orderId);
             
             if (result.success) {
-                console.log('Order data received:', result.data);
-                console.log('Address data:', result.data.shipping_address || result.data.address || result.data.delivery_address);
                 setOrder(result.data);
                 
                 // Check if we need to fetch address details separately
                 if (result.data.address_id && !result.data.shipping_address && !result.data.address) {
                     try {
-                        console.log('Fetching address details for address_id:', result.data.address_id);
                         const addressResult = await fetchAddresses();
                         if (addressResult.data && Array.isArray(addressResult.data)) {
                             const matchingAddress = addressResult.data.find(addr => addr.id === result.data.address_id);
                             if (matchingAddress) {
-                                console.log('Found matching address:', matchingAddress);
                                 setShippingAddress(matchingAddress);
                             }
                         }

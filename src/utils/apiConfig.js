@@ -75,7 +75,7 @@ export const ALL_ENDPOINTS = {
   ...AUTHENTICATION_ENDPOINTS
 };
 
-export default {
+const apiConfig = {
   API_BASE_URL,
   API_MODULES,
   AUTH_ENDPOINTS,
@@ -90,3 +90,5 @@ export default {
   isValidEndpoint,
   getDefaultHeaders
 };
+
+export default apiConfig;

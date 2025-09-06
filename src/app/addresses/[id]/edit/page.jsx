@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 
 import { fetchAddresses, updateAddress } from "../../../../services/api/addresses";
-import AddressesProtectedRoute from "../../ProtectedRoute";
+import ProtectedRoute from "../../../../components/ProtectedRoute";
 
 export default function EditAddressPage() {
   const router = useRouter();
@@ -66,7 +66,7 @@ export default function EditAddressPage() {
   if (!form) return null;
 
   return (
-    <AddressesProtectedRoute>
+    <ProtectedRoute>
       <main className="max-w-lg mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold mb-6">Edit Address</h1>
         {error && <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>}
@@ -118,6 +118,6 @@ export default function EditAddressPage() {
           </div>
         </form>
       </main>
-    </AddressesProtectedRoute>
+    </ProtectedRoute>
   );
 }

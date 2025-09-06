@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { createAddress } from "../../../services/api/addresses";
-import AddressesProtectedRoute from "../ProtectedRoute";
+import ProtectedRoute from "../../../components/ProtectedRoute";
 
 export default function NewAddressPage() {
   const [form, setForm] = useState({
@@ -45,7 +45,7 @@ export default function NewAddressPage() {
   };
 
   return (
-    <AddressesProtectedRoute>
+    <ProtectedRoute>
       <main className="max-w-lg mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold mb-6">Add New Address</h1>
         {error && <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>}
@@ -97,6 +97,6 @@ export default function NewAddressPage() {
           </div>
         </form>
       </main>
-    </AddressesProtectedRoute>
+    </ProtectedRoute>
   );
 }

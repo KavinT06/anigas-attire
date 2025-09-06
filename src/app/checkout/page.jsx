@@ -1,14 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import useCartStore from '../../store/cartStore';
 import ToastContainer, { useToast } from '../components/Toast';
 import ProtectedRoute from '../../components/ProtectedRoute';
-import ProfileCompletionBanner from '../components/ProfileCompletionBanner';
-import { useProfile } from '../../hooks/useProfile';
 import { 
   createOrder, 
   getCart, 
@@ -28,7 +26,6 @@ const CheckoutPage = () => {
   const router = useRouter();
   const { items, getTotalPrice, getTotalItems, clearCart } = useCartStore();
   const { toasts, removeToast, toast } = useToast();
-  const { profile, loading: profileLoading, fetchProfile, getProfileField } = useProfile();
   
   // Form states
   const [addresses, setAddresses] = useState([]);
@@ -51,25 +48,7 @@ const CheckoutPage = () => {
   const [deletingAddressId, setDeletingAddressId] = useState(null);
   const [isAddingAddress, setIsAddingAddress] = useState(false);
 
-  // Load profile data and addresses on mount
-  useEffect(() => {
-    fetchProfile(false);
-    loadAddresses();
-  }, [fetchProfile]);
-
-  // Redirect if cart is empty
-  useEffect(() => {
-    if (items.length === 0) {
-      router.push('/cart');
-    }
-  }, [items.length, router]);
-
-  // Scroll to top on mount
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  const loadAddresses = async () => {
+  const loadAddresses = useCallback(async () => {
     setLoadingAddresses(true);
     try {
       const result = await fetchAddresses();
@@ -88,7 +67,24 @@ const CheckoutPage = () => {
     } finally {
       setLoadingAddresses(false);
     }
-  };
+  }, [selectedAddressId, toast]);
+
+  // Load addresses on mount
+  useEffect(() => {
+    loadAddresses();
+  }, []);
+
+  // Redirect if cart is empty
+  useEffect(() => {
+    if (items.length === 0) {
+      router.push('/cart');
+    }
+  }, [items.length, router]);
+
+  // Scroll to top on mount
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const formatPrice = (price) => {
     return `₹${parseFloat(price).toFixed(2)}`;
@@ -174,10 +170,7 @@ const CheckoutPage = () => {
         country: 'India' // Default country
       };
       
-      console.log('Creating address with data:', addressData);
-      
       const result = await createNewAddress(addressData);
-      console.log('Address API response:', result);
       
       // Handle both direct data response and nested data response
       const addressData_response = result.data || result;
@@ -188,7 +181,6 @@ const CheckoutPage = () => {
         // Update addresses state with the new address
         setAddresses(prev => {
           const updatedAddresses = [...prev, addressData_response];
-          console.log('Updated addresses list:', updatedAddresses);
           return updatedAddresses;
         });
         
@@ -507,9 +499,6 @@ const CheckoutPage = () => {
             Review your order and complete your purchase
           </p>
         </div>
-
-        {/* Profile Completion Banner */}
-        <ProfileCompletionBanner currentPage="checkout" />
 
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-12">
           {/* Order Summary */}

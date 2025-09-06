@@ -420,7 +420,7 @@ export const migrateLocalWishlistToBackend = async () => {
   }
 };
 
-export default {
+const wishlistApi = {
   getWishlistItems,
   addToWishlist,
   removeFromWishlist,
@@ -429,3 +429,5 @@ export default {
   handleWishlistAuthError,
   migrateLocalWishlistToBackend
 };
+
+export default wishlistApi;

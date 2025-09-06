@@ -1,12 +1,13 @@
 'use client';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import useCartStore from '../../store/cartStore';
 import ToastContainer, { useToast } from '../components/Toast';
 import ProtectedRoute from '../../components/ProtectedRoute';
-import ProfileCompletionBanner from '../components/ProfileCompletionBanner';
 
 const CartPage = () => {
+  const [mounted, setMounted] = useState(false);
   const { 
     items, 
     updateQuantity, 
@@ -16,6 +17,28 @@ const CartPage = () => {
   } = useCartStore();
   
   const { toasts, removeToast, toast } = useToast();
+
+  // Prevent hydration issues
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <ProtectedRoute>
+        <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100">
+          <div className="py-16 px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div className="text-center">
+              <div className="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+              </div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-4">Loading Cart...</h1>
+            </div>
+          </div>
+        </div>
+      </ProtectedRoute>
+    );
+  }
 
   const formatPrice = (price) => {
     return `₹${price.toFixed(2)}`;
@@ -94,9 +117,6 @@ const CartPage = () => {
             {totalItems} {totalItems === 1 ? 'item' : 'items'} in your cart
           </p>
         </div>
-
-        {/* Profile Completion Banner */}
-        <ProfileCompletionBanner currentPage="cart" />
 
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-12 lg:items-start">
           {/* Cart Items */}

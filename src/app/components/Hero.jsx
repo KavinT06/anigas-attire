@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import logo  from "../../assets/logo.jpg"
 import heroimg from "../../assets/hero-img.jpg";
 
 export default function Hero() {
