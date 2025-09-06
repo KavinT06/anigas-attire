@@ -235,7 +235,7 @@ const Login = () => {
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl">
         <ReCAPTCHA
           ref={recaptchaRef}
-          sitekey={process.env.RECAPTCHA_SITE_KEY || "6Ldv-zMqAAAAAHvipf7LMgO92j_KK3mUm6xfvRdE"}
+          sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "6Ldv-zMqAAAAAHvipf7LMgO92j_KK3mUm6xfvRdE"}
           size="invisible"
           onChange={setCaptchaToken}
           onError={onRecaptchaError}
