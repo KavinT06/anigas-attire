@@ -1,30 +1,27 @@
-version: '3.8'
+name: anigas-attire
 
 services:
   frontend:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ../../
+      dockerfile: docker/prod/Dockerfile
     container_name: anigas-attire-frontend
     ports:
       - "3000:3000"
     env_file:
-      - .env.local
-    environment:
-      - BACKEND_URL=${BACKEND_URL}
-      - RECAPTCHA_SITE_KEY=${RECAPTCHA_SITE_KEY}
+      - ../../.env.prod
     restart: unless-stopped
     networks:
       - anigas-network
 
   backend:
     image: infominsolutions/cashya-shoppy:latest
-    container_name: anigas-backend
+    pull_policy: always
+    container_name: anigas-attire-backend
     ports:
       - "5025:5025"
-    environment:
-      - DJANGO_SETTINGS_MODULE=your_project.settings.production
-      - DATABASE_URL=postgresql://user:password@db:5432/anigas_db
+    env_file:
+      - ../../.env.prod
     restart: unless-stopped
     networks:
       - anigas-network
