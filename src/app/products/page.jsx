@@ -5,9 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import axios from 'axios';
 import Image from 'next/image';
-import useCartStore from '../../store/cartStore';
-import ToastContainer, { useToast } from '../components/Toast';
-import QuickBuyModal from '../components/QuickBuyModal';
+import useCartStore from '../../services/cartStore';
+import ToastContainer, { useToast } from '../../components/Toast';
+import QuickBuyModal from '../../components/QuickBuyModal';
 import { getAuthHeaders } from '../../utils/auth';
 import { useWishlist } from '../../contexts/WishlistContext';
 import { API_BASE_URL, ECOM_ENDPOINTS, getCategoryProductsUrl } from '../../utils/apiConfig';
@@ -180,51 +180,14 @@ function ProductListContent() {
             <ToastContainer toasts={toasts} removeToast={removeToast} />
 
             {/* Main Content */}
-            <section className="py-12 sm:py-16 lg:py-20">
+            <section className="py-8 sm:py-12 lg:py-16">
                 <div className="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl">
-                    {/* Breadcrumb and Page Header */}
-                    <div className="mb-8">
-                        <nav className="flex mb-4" aria-label="Breadcrumb">
-                            <ol className="inline-flex items-center space-x-1 md:space-x-3">
-                                <li className="inline-flex items-center">
-                                    <Link href="/" className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-orange-600">
-                                        <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
-                                        </svg>
-                                        Home
-                                    </Link>
-                                </li>
-                                <li>
-                                    <div className="flex items-center">
-                                        <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd"></path>
-                                        </svg>
-                                        {categoryId ? (
-                                            <a href="/categories" className="ml-1 text-sm font-medium text-gray-700 hover:text-orange-600 md:ml-2">Categories</a>
-                                        ) : (
-                                            <span className="ml-1 text-sm font-medium text-gray-500 md:ml-2">Products</span>
-                                        )}
-                                    </div>
-                                </li>
-                                {categoryId && (
-                                    <li aria-current="page">
-                                        <div className="flex items-center">
-                                            <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd"></path>
-                                            </svg>
-                                            <span className="ml-1 text-sm font-medium text-gray-500 md:ml-2">
-                                                {categoryName || `Category ${categoryId}`}
-                                            </span>
-                                        </div>
-                                    </li>
-                                )}
-                            </ol>
-                        </nav>
-
+                    {/* Page Header */}
+                    <div className="text-center mb-8">
                         <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl lg:text-6xl">
                             {categoryId ? (categoryName || `Category Products`) : 'All Products'}
                         </h1>
-                        <p className="mt-4 text-lg text-gray-600 max-w-2xl">
+                        <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
                             {categoryId 
                                 ? `Discover all products in ${categoryName || 'this category'}`
                                 : 'Browse our complete collection of premium fashion items'
@@ -233,19 +196,25 @@ function ProductListContent() {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex flex-wrap gap-4 mb-8">
+                    <div className="flex flex-wrap justify-center gap-4 mb-8">
                         {categoryId && (
                             <button
                                 onClick={() => router.push('/products')}
-                                className="inline-flex items-center justify-center px-6 py-2 text-sm font-medium text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+                                className="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold text-white transition-all duration-300 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 rounded-lg shadow-lg"
                             >
+                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                </svg>
                                 View All Products
                             </button>
                         )}
                         <button
                             onClick={() => router.push('/categories')}
-                            className="inline-flex items-center justify-center px-6 py-2 text-sm font-medium text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+                            className="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold text-white transition-all duration-300 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-red-700 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-lg shadow-lg"
                         >
+                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                            </svg>
                             Browse Categories
                         </button>
                     </div>
@@ -447,8 +416,11 @@ function ProductListContent() {
                                 </p>
                                 <button
                                     onClick={() => router.push('/categories')}
-                                    className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white transition-all duration-200 bg-orange-500 hover:bg-orange-600 focus:bg-orange-600 rounded-lg shadow-lg"
+                                    className="inline-flex items-center justify-center px-8 py-3 text-base font-semibold text-white transition-all duration-300 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-lg shadow-lg"
                                 >
+                                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                    </svg>
                                     Browse Categories
                                 </button>
                             </div>

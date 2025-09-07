@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import useCartStore from '../../store/cartStore';
+import useCartStore from '../services/cartStore';
 
 const QuickBuyModal = ({ product, isOpen, onClose, toast }) => {
   const [selectedSize, setSelectedSize] = useState('');

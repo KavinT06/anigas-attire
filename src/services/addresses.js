@@ -1,5 +1,5 @@
 // Address API helpers for Django backend
-import axiosInstance from '../../utils/axiosInstance';
+import axiosInstance from '../utils/axiosInstance';
 
 export async function fetchAddresses() {
   try {

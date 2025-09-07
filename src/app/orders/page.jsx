@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import ProtectedRoute from '../../components/ProtectedRoute';
-import { getOrders } from '../../services/api/orders';
+import { getOrders } from '../../services/orders';
 
 const OrdersPage = () => {
     const [orders, setOrders] = useState([]);

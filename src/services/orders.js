@@ -1,5 +1,5 @@
-import api from '../../utils/axiosInstance';
-import { ECOM_ENDPOINTS } from '../../utils/apiConfig';
+import api from '../utils/axiosInstance';
+import { ECOM_ENDPOINTS } from '../utils/apiConfig';
 
 /**
  * Orders API service

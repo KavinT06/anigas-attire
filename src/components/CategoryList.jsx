@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import Image from 'next/image';
-import { getAuthHeaders } from '../../utils/auth';
-import { API_BASE_URL, ECOM_ENDPOINTS } from '../../utils/apiConfig';
-import logo from "../../assets/logo.jpg";
+import { getAuthHeaders } from '../utils/auth';
+import { API_BASE_URL, ECOM_ENDPOINTS } from '../utils/apiConfig';
+import logo from "../assets/logo.jpg";
 
 export default function CategoryList() {
     const [categories, setCategories] = useState([]);
@@ -102,14 +102,14 @@ export default function CategoryList() {
                     )}
 
                     {/* View All Products Button */}
-                    <div className="text-center mb-8">
+                    {/* <div className="text-center mb-8">
                         <button
                             onClick={handleViewAllProducts}
                             className="inline-flex items-center justify-center px-8 py-3 text-base font-semibold text-white transition-all duration-200 bg-orange-500 hover:bg-orange-600 focus:bg-orange-600 rounded-lg shadow-lg"
                         >
                             View All Products
                         </button>
-                    </div>
+                    </div> */}
 
                     {/* Categories Grid */}
                     {categories.length > 0 ? (
@@ -179,7 +179,7 @@ export default function CategoryList() {
                     )}
 
                     {/* Additional Actions */}
-                    {categories.length > 0 && (
+                    {/* {categories.length > 0 && (
                         <div className="text-center mt-12">
                             <button
                                 onClick={() => window.location.reload()}
@@ -191,7 +191,7 @@ export default function CategoryList() {
                                 Refresh Categories
                             </button>
                         </div>
-                    )}
+                    )} */}
                 </div>
             </section>
         </div>

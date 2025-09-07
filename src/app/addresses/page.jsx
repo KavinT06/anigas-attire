@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { fetchAddresses, deleteAddress } from "../../services/api/addresses";
+import { fetchAddresses, deleteAddress } from "../../services/addresses";
 import Link from "next/link";
 import ProtectedRoute from "../../components/ProtectedRoute";
 

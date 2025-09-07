@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { createAddress } from "../../../services/api/addresses";
+import { createAddress } from "../../../services/addresses";
 import ProtectedRoute from "../../../components/ProtectedRoute";
 
 export default function NewAddressPage() {

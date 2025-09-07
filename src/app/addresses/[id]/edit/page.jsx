@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 
-import { fetchAddresses, updateAddress } from "../../../../services/api/addresses";
+import { fetchAddresses, updateAddress } from "../../../../services/addresses";
 import ProtectedRoute from "../../../../components/ProtectedRoute";
 
 export default function EditAddressPage() {

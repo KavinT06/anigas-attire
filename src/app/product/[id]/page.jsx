@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import Image from 'next/image';
-import useCartStore from '../../../store/cartStore';
+import useCartStore from '../../../services/cartStore';
 import toast, { Toaster } from 'react-hot-toast';
 import { getAuthHeaders } from '../../../utils/auth';
 import { useWishlist } from '../../../contexts/WishlistContext';

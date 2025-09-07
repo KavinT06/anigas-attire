@@ -4,8 +4,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import useCartStore from '../../store/cartStore';
-import ToastContainer, { useToast } from '../components/Toast';
+import useCartStore from '../../services/cartStore';
+import ToastContainer, { useToast } from '../../components/Toast';
 import ProtectedRoute from '../../components/ProtectedRoute';
 import { 
   createOrder, 
@@ -13,12 +13,12 @@ import {
   addToCart,
   removeFromCart,
   initiatePayment 
-} from '../../services/api/orders';
+} from '../../services/orders';
 import { 
   fetchAddresses, 
   createAddress as createNewAddress,
   deleteAddress 
-} from '../../services/api/addresses';
+} from '../../services/addresses';
 import api from '../../utils/axiosInstance';
 import { ECOM_ENDPOINTS } from '../../utils/apiConfig';
 

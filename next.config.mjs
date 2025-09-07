@@ -1,18 +1,18 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     // Force enable source maps in development
-    productionBrowserSourceMaps: false,
-    experimental: {
-        serverSourceMaps: true,
-    },
+    // productionBrowserSourceMaps: false,
+    // experimental: {
+    //     serverSourceMaps: true,
+    // },
     
     // Ensure proper source map generation
-    webpack: (config, { dev, isServer }) => {
-        if (dev) {
-            config.devtool = 'eval-source-map';
-        }
-        return config;
-    },
+    // webpack: (config, { dev, isServer }) => {
+    //     if (dev) {
+    //         config.devtool = 'eval-source-map';
+    //     }
+    //     return config;
+    // },
     
     images: {
         remotePatterns: [
