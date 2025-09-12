@@ -1,74 +1,98 @@
 {
-	"version": "2.0.0",
-	"tasks": [
-		{
-			"label": "Start Development Server",
-			"type": "shell",
-			"command": "npm run dev",
-			"group": "build",
-			"isBackground": true,
-			"problemMatcher": []
-		},
-		{
-			"label": "Production Build",
-			"type": "shell",
-			"command": "npm run build",
-			"group": "build",
-			"isBackground": false,
-			"problemMatcher": []
-		},
-		{
-			"label": "Start Production Server",
-			"type": "shell",
-			"command": "npm start",
-			"group": "build",
-			"isBackground": true,
-			"problemMatcher": [],
-			"dependsOn": "Production Build"
-		},
-		{
-			"label": "Start Dev Docker Compose",
-			"type": "shell",
-			"command": "docker",
-			"args": [
-				"compose",
-				"-f",
-				"docker/dev/docker-compose.yml",
-				"up",
-				"--build",
-				"-d"
-			],
-			"group": "build",
-			"isBackground": true,
-			"problemMatcher": [],
-			"presentation": {
-				"echo": true,
-				"reveal": "always",
-				"focus": false,
-				"panel": "shared",
-				"group": "docker"
-			}
-		},
-		{
-			"label": "Stop Dev Docker Compose",
-			"type": "shell",
-			"command": "docker",
-			"args": [
-				"compose",
-				"-f",
-				"docker/dev/docker-compose.yml",
-				"down"
-			],
-			"group": "build",
-			"isBackground": false,
-			"problemMatcher": [],
-			"presentation": {
-				"echo": true,
-				"reveal": "always",
-				"focus": false,
-				"panel": "shared",
-				"group": "docker"
-			}
-		}
-	]
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Dev: Build Start",
+            "type": "shell",
+            "command": "docker",
+            "args": [
+                "compose",
+                "-f",
+                "docker/dev/docker-compose.yml",
+                "up",
+                "--build",
+                "-d"
+            ],
+            "problemMatcher": [],
+            "detail": "Build and start the dev environment",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "clear": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "Dev: (Re)Start",
+            "type": "shell",
+            "command": "docker",
+            "args": [
+                "compose",
+                "-f",
+                "docker/dev/docker-compose.yml",
+                "restart"
+            ],
+            "problemMatcher": [],
+            "detail": "Start or restart the dev environment",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "Prod: Build Start",
+            "type": "shell",
+            "command": "docker",
+            "args": [
+                "compose",
+                "-f",
+                "docker/prod/docker-compose.yml",
+                "up",
+                "--build",
+                "-d"
+            ],
+            "problemMatcher": [],
+            "detail": "Build and start the prod environment",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "clear": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "Prod: (Re)Start",
+            "type": "shell",
+            "command": "docker",
+            "args": [
+                "compose",
+                "-f",
+                "docker/prod/docker-compose.yml",
+                "restart"
+            ],
+            "problemMatcher": [],
+            "detail": "Start or restart the prod environment",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        }
+    ]
 }
