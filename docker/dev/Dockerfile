@@ -18,11 +18,10 @@ COPY . .
 EXPOSE 3000
 
 # Expose ports for Node.js debugging
-EXPOSE 9230 9231
+EXPOSE 9229 9230
 
-# Set Node.js debugging options and enable source maps
-ENV NODE_OPTIONS="--inspect=0.0.0.0:9230 --enable-source-maps"
+# Force development mode and set debugging options
 ENV NODE_ENV="development"
 
-# Start development server
-CMD ["npm", "run", "dev"]
+# Start development server with debugging
+CMD ["npm", "run", "dev:debug"]

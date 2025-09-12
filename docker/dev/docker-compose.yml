@@ -8,18 +8,19 @@ services:
     container_name: anigas-attire-frontend-dev
     ports:
       - "3000:3000"   # Next.js dev server
-      - "9230:9230"   # Node.js debugger (main process)
-      - "9231:9231"   # Next.js router server debugger (Turbopack)
+      - "9229:9229"   # Node.js debugger
+      - "9230:9230"   # Next.js router debugger
     env_file:
       - ../../.env.dev
     environment:
       - NODE_ENV=development
     volumes:
-      # Mount entire project for better source mapping
+      # Mount entire project for live code updates + source maps
       - ../../:/app
-      # Preserve container-specific directories
+      # Preserve container-specific node_modules
       - /app/node_modules
-      - /app/.next
+      # Sync .next folder to inspect generated files locally
+      - ../../.next:/app/.next
     restart: unless-stopped
     networks:
       - anigas-network-dev
