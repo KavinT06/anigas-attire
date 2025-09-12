@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import ProtectedRoute from '../../../components/ProtectedRoute';
-import { getOrderById } from '../../../services/api/orders';
-import { fetchAddresses } from '../../../services/api/addresses';
+import { getOrderById } from '../../../services/orders';
+import { fetchAddresses } from '../../../services/addresses';
 
 const OrderDetailsPage = () => {
     const params = useParams();

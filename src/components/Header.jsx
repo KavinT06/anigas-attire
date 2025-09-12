@@ -2,11 +2,11 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import useCartStore from '../../store/cartStore';
-import { logout } from '../../utils/auth';
-import { useAuth } from '../../contexts/AuthContext';
-import { useWishlist } from '../../contexts/WishlistContext';
-import logo from '../../assets/logo.jpg';
+import useCartStore from '../services/cartStore';
+import { logout } from '../utils/auth';
+import { useAuth } from '../contexts/AuthContext';
+import { useWishlist } from '../contexts/WishlistContext';
+import logo from '../assets/logo.jpg';
 
 const Header = () => {
   const [totalItems, setTotalItems] = useState(0);

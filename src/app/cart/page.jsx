@@ -2,8 +2,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import useCartStore from '../../store/cartStore';
-import ToastContainer, { useToast } from '../components/Toast';
+import useCartStore from '../../services/cartStore';
+import ToastContainer, { useToast } from '../../components/Toast';
 import ProtectedRoute from '../../components/ProtectedRoute';
 
 const CartPage = () => {

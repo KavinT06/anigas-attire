@@ -78,16 +78,15 @@ src/
 │   ├── AuthContext.jsx        # Authentication state
 │   └── WishlistContext.jsx    # Wishlist state
 ├── hooks/                     # Custom React hooks
-├── services/                  # API services
-│   └── api/
-│       └── orders.js          # Complete orders API layer
-├── store/                     # State management
-│   └── cartStore.js           # Cart state (Zustand)
+├── services/                  # API services & state management
+│   ├── addresses.js           # Address API calls
+│   ├── cartStore.js           # Cart state (Zustand)
+│   ├── orders.js              # Order API calls
+│   └── wishlistService.js     # Wishlist service
 └── utils/                     # Utility functions
     ├── apiConfig.js           # API configuration
     ├── auth.js                # Authentication helpers
-    ├── axiosInstance.js       # HTTP client setup
-    └── wishlistApi.js         # Wishlist API calls
+    └── axiosInstance.js       # HTTP client setup
 ```
 
 ## 🛒 Order Management Features
