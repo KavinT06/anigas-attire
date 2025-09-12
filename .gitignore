@@ -42,7 +42,6 @@ next-env.d.ts
 
 # IDE and editor files
 .vscode/settings.json
-.vscode/launch.json
 .idea/
 *.swp
 *.swo

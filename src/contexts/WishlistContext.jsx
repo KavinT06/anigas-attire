@@ -1,5 +1,5 @@
 "use client";
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import { 
   getWishlistItems, 
@@ -8,7 +8,7 @@ import {
   findWishlistItem,
   migrateLocalWishlistToBackend,
   isWishlistAuthValid 
-} from '../utils/wishlistApi';
+} from '../services/wishlistService';
 import toast from 'react-hot-toast';
 
 const WishlistContext = createContext(null);
@@ -335,7 +335,7 @@ export const WishlistProvider = ({ children }) => {
       let migrated = 0;
       for (const item of localWishlist) {
         try {
-          await addToWishlistAPI(item.id, item);
+          await addToWishlist(item.id);
           migrated++;
         } catch (error) {
           console.error('Failed to migrate item:', item.id, error);

@@ -1,0 +1,31 @@
+name: anigas-attire
+
+services:
+  frontend:
+    build:
+      context: ../../
+      dockerfile: docker/prod/Dockerfile
+    container_name: anigas-attire-frontend
+    ports:
+      - "3000:3000"
+    env_file:
+      - ../../.env.prod
+    restart: unless-stopped
+    networks:
+      - anigas-network
+
+  backend:
+    image: infominsolutions/cashya-shoppy:latest
+    pull_policy: always
+    container_name: anigas-attire-backend
+    ports:
+      - "5025:5025"
+    env_file:
+      - ../../.env.prod
+    restart: unless-stopped
+    networks:
+      - anigas-network
+
+networks:
+  anigas-network:
+    driver: bridge

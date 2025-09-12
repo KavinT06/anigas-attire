@@ -4,7 +4,7 @@
  */
 
 // Base URL configuration
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5025";
+export const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5025";
 
 // Main API modules
 export const API_MODULES = {
@@ -75,7 +75,7 @@ export const ALL_ENDPOINTS = {
   ...AUTHENTICATION_ENDPOINTS
 };
 
-export default {
+const apiConfig = {
   API_BASE_URL,
   API_MODULES,
   AUTH_ENDPOINTS,
@@ -90,3 +90,5 @@ export default {
   isValidEndpoint,
   getDefaultHeaders
 };
+
+export default apiConfig;
