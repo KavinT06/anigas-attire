@@ -9,10 +9,9 @@ yarn-error.log*
 out
 
 # Environment files
-.env
 .env.local
-.env.production.local
-.env.development.local
+.env.prod
+.env.dev
 
 # IDE files
 .vscode
