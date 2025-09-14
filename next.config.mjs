@@ -1,4 +1,22 @@
 /** @type {import('next').NextConfig} */
+const getRuntimeConfig = () => {
+    const serverRuntimeConfig = {};
+    const publicRuntimeConfig = {};
+
+    for (const [key, value] of Object.entries(process.env)) {
+        if (key.startsWith('NEXT_PUBLIC_')) {
+            publicRuntimeConfig[key] = value;
+        } else {
+            serverRuntimeConfig[key] = value;
+        }
+    }
+
+    return {
+        serverRuntimeConfig,
+        publicRuntimeConfig
+    };
+}
+
 const nextConfig = {
     reactStrictMode: true,
     productionBrowserSourceMaps: true, // ✅ allows debugging minified client bundles
@@ -8,7 +26,7 @@ const nextConfig = {
         }
         return config;
     },
-    
+    ...getRuntimeConfig(),
     images: {
         remotePatterns: [
             {
