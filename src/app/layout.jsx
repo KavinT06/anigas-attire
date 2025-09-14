@@ -1,7 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import 'flowbite/dist/flowbite.css';
-import Header from './components/Header';
+import Header from '../components/Header';
 import { AuthProvider } from '../contexts/AuthContext';
 import { WishlistProvider } from '../contexts/WishlistContext';
 
@@ -23,6 +22,10 @@ export const metadata = {
 export default function RootLayout({ children }) {
     return (
         <html lang="en">
+            <head>
+                {/* Razorpay SDK for payment integration */}
+                <script src="https://checkout.razorpay.com/v1/checkout.js" async></script>
+            </head>
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
             >

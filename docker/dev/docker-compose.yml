@@ -1,0 +1,46 @@
+name: anigas-attire-dev
+
+services:
+  frontend:
+    build:
+      context: ../../
+      dockerfile: docker/dev/Dockerfile
+    container_name: anigas-attire-frontend-dev
+    ports:
+      - "3000:3000"   # Next.js dev server
+      - "9230:9230"   # Node.js debugger (main process)
+      - "9231:9231"   # Next.js router server debugger (Turbopack)
+    env_file:
+      - ../../.env.dev
+    environment:
+      - NODE_ENV=development
+    volumes:
+      # Mount entire project for better source mapping
+      - ../../:/app
+      # Preserve container-specific directories
+      - /app/node_modules
+      - /app/.next
+    restart: unless-stopped
+    networks:
+      - anigas-network-dev
+    # Enable for easier debugging
+    stdin_open: true
+    tty: true
+
+  backend:
+    image: infominsolutions/cashya-shoppy:latest
+    pull_policy: missing  # Use local image for faster dev startup
+    container_name: anigas-attire-backend-dev
+    ports:
+      - "5025:5025"
+    env_file:
+      - ../../.env.dev
+    environment:
+      - DEBUG=True
+    restart: unless-stopped
+    networks:
+      - anigas-network-dev
+
+networks:
+  anigas-network-dev:
+    driver: bridge

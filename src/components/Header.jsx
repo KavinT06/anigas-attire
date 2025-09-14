@@ -1,12 +1,12 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import useCartStore from '../../store/cartStore';
-import { logout } from '../../utils/auth';
-import { useAuth } from '../../contexts/AuthContext';
-import { useWishlist } from '../../contexts/WishlistContext';
-import logo from '../../assets/logo.jpg';
+import useCartStore from '../services/cartStore';
+import { logout } from '../utils/auth';
+import { useAuth } from '../contexts/AuthContext';
+import { useWishlist } from '../contexts/WishlistContext';
+import logo from '../assets/logo.jpg';
 
 const Header = () => {
   const [totalItems, setTotalItems] = useState(0);
@@ -55,7 +55,7 @@ const Header = () => {
   // Don't render auth-dependent content until mounted (prevents hydration issues)
   if (!mounted) {
     return (
-      <header className="">
+      <header className="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50 shadow-sm">
         <div className="px-4 mx-auto sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 lg:h-20">
             <div className="flex-shrink-0 inline-flex">
@@ -102,7 +102,7 @@ const Header = () => {
   }
 
   return (
-    <header className="">
+    <header className="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50 shadow-sm">
       <div className="px-4 mx-auto sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           <div className="flex-shrink-0 inline-flex">
@@ -199,16 +199,9 @@ const Header = () => {
                 
                 {/* Dropdown Menu */}
                 {showDropdown && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-[60] border border-gray-200">
                     <Link 
-                      href="/profile" 
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
-                      onClick={() => setShowDropdown(false)}
-                    >
-                      👤 Profile
-                    </Link>
-                    <Link 
-                      href="/account/orders" 
+                      href="/orders" 
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
                       onClick={() => setShowDropdown(false)}
                     >
@@ -247,8 +240,8 @@ const Header = () => {
 
         {/* Mobile Menu */}
         {showMobileMenu && (
-          <div className="lg:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 bg-white border-t border-gray-200">
+          <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-b border-gray-200 shadow-lg">
+            <div className="px-2 pt-2 pb-3 space-y-1">
               <Link 
                 href="/" 
                 className="block px-3 py-2 text-base font-medium text-black hover:text-orange-500 hover:bg-gray-50 rounded-md transition-colors duration-200"
@@ -310,14 +303,7 @@ const Header = () => {
                       </span>
                     </div>
                     <Link 
-                      href="/profile" 
-                      className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-orange-500 hover:bg-gray-50 rounded-md transition-colors duration-200"
-                      onClick={closeMobileMenu}
-                    >
-                      👤 Profile
-                    </Link>
-                    <Link 
-                      href="/account/orders" 
+                      href="/orders" 
                       className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-orange-500 hover:bg-gray-50 rounded-md transition-colors duration-200"
                       onClick={closeMobileMenu}
                     >
@@ -359,7 +345,7 @@ const Header = () => {
       {/* Overlay for dropdown/mobile menu */}
       {(showDropdown || showMobileMenu) && (
         <div 
-          className="fixed inset-0 z-40" 
+          className="fixed inset-0 z-[55]" 
           onClick={() => {
             setShowDropdown(false);
             setShowMobileMenu(false);

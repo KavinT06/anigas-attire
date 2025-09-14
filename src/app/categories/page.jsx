@@ -1,6 +1,6 @@
 "use client";
 
-import CategoryList from '../components/CategoryList';
+import CategoryList from '../../components/CategoryList';
 
 export default function CategoriesPage() {
     return <CategoryList />;
