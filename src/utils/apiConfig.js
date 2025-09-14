@@ -1,11 +1,10 @@
-import getConfig from 'next/config';
 /**
  * API Configuration for Anigas Attire Backend
  * Centralized endpoint configuration based on Django backend structure
  */
-const { publicRuntimeConfig } = getConfig();
+
 // Base URL configuration
-export const API_BASE_URL = publicRuntimeConfig.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5025";
+export const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5025";
 
 // Main API modules
 export const API_MODULES = {
