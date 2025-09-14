@@ -8,7 +8,7 @@
             "args": [
                 "compose",
                 "-f",
-                "docker/dev/docker-compose.yml",
+                "docker/dev/compose.yml",
                 "up",
                 "--build",
                 "-d"
@@ -35,7 +35,7 @@
             "args": [
                 "compose",
                 "-f",
-                "docker/dev/docker-compose.yml",
+                "docker/dev/compose.yml",
                 "restart"
             ],
             "problemMatcher": [],
@@ -56,7 +56,7 @@
             "args": [
                 "compose",
                 "-f",
-                "docker/prod/docker-compose.yml",
+                "docker/prod/compose.yml",
                 "up",
                 "--build",
                 "-d"
@@ -80,7 +80,7 @@
             "args": [
                 "compose",
                 "-f",
-                "docker/prod/docker-compose.yml",
+                "docker/prod/compose.yml",
                 "restart"
             ],
             "problemMatcher": [],
