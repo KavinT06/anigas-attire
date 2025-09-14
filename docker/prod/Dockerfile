@@ -7,7 +7,7 @@ RUN npm ci
 
 COPY . .
 
-RUN source .env && npm run build
+RUN npm run build
 
 EXPOSE 3000
 

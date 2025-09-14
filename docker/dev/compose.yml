@@ -7,11 +7,11 @@ services:
       dockerfile: docker/dev/Dockerfile
     container_name: anigas-attire-frontend-dev
     ports:
-      - "3000:3000"   # Next.js dev server
-      - "9229:9229"   # Node.js debugger
-      - "9230:9230"   # Next.js router debugger
+      - "3000:3000" # Next.js dev server
+      - "9229:9229" # Node.js debugger
+      - "9230:9230" # Next.js router debugger
     env_file:
-      - ../../.env.dev
+      - ../../.env
     environment:
       - NODE_ENV=development
     volumes:
@@ -33,11 +33,9 @@ services:
     pull_policy: always
     container_name: anigas-attire-backend-dev
     ports:
-      - "5025:5025"
+      - "8000:8000"
     env_file:
-      - ../../.env.dev
-    environment:
-      - DEBUG=True
+      - ../../.env
     restart: unless-stopped
     networks:
       - anigas-network-dev
