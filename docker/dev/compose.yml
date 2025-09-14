@@ -41,6 +41,8 @@ services:
     restart: unless-stopped
     networks:
       - anigas-network-dev
+    volumes:
+      - ../../backend-data:/app/data
 
 networks:
   anigas-network-dev:

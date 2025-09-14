@@ -17,7 +17,7 @@ services:
       - anigas-network
 
   backend:
-    image: infominsolutions/cashya-shoppy:latest-dev
+    image: infominsolutions/cashya-shoppy:latest
     pull_policy: always
     container_name: anigas-attire-backend
     ports:
@@ -27,7 +27,14 @@ services:
     restart: unless-stopped
     networks:
       - anigas-network
+    volumes:
+      - backend-data:/app/data
+      
 
 networks:
   anigas-network:
     driver: bridge
+
+volumes:
+  backend-data:
+    name: anigas-attire-backend-data
