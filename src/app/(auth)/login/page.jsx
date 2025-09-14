@@ -7,7 +7,9 @@ import Link from "next/link";
 import Image from "next/image";
 import Logo from "../../../assets/logo.jpg";
 import { API_BASE_URL, AUTH_ENDPOINTS } from "../../../utils/apiConfig";
+import getConfig from 'next/config';
 
+const { publicRuntimeConfig } = getConfig();
 const Login = () => {
   const [step, setStep] = useState(1);
   const [mobile, setMobile] = useState("");
@@ -235,7 +237,7 @@ const Login = () => {
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl">
         <ReCAPTCHA
           ref={recaptchaRef}
-          sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "6Ldv-zMqAAAAAHvipf7LMgO92j_KK3mUm6xfvRdE"}
+          sitekey={publicRuntimeConfig.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "6Ldv-zMqAAAAAHvipf7LMgO92j_KK3mUm6xfvRdE"}
           size="invisible"
           onChange={setCaptchaToken}
           onError={onRecaptchaError}
