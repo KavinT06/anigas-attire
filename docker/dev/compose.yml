@@ -29,8 +29,8 @@ services:
     tty: true
 
   backend:
-    image: infominsolutions/cashya-shoppy:latest
-    pull_policy: missing  # Use local image for faster dev startup
+    image: infominsolutions/cashya-shoppy:latest-dev
+    pull_policy: always
     container_name: anigas-attire-backend-dev
     ports:
       - "5025:5025"
