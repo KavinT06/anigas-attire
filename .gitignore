@@ -71,3 +71,6 @@ PROFILE_ENDPOINT_FIX.md
 # Cleanup scripts
 cleanup.sh
 cleanup.bat
+*.log
+backend-data/
+compose.override.yml

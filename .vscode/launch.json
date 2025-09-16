@@ -1,114 +1,71 @@
 {
-  // Debug Next.js inside Docker: attach to Node inspector with proper path mappings
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Launch: Next.js with Debugging",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/next/dist/bin/next",
+      "runtimeArgs": [
+        "--inspect"
+      ],
+      "skipFiles": [
+        "<node_internals>/"
+      ],
+      "serverReadyAction": {
+        "action": "debugWithEdge",
+        "killOnServerStop": true,
+        "pattern": "- Local:.+(https?://.+)",
+        "uriFormat": "%s",
+        "webRoot": "${workspaceFolder}"
+      }
+    },
+    {
+      "name": "Attach: Next.js Server (9229)",
       "type": "node",
       "request": "attach",
-      "name": "Attach: Next.js server (Node, 9230)",
+      "address": "localhost",
+      "port": 9229,
+      "restart": true,
+      "localRoot": "${workspaceFolder}",
+      "remoteRoot": "/app",
+      "skipFiles": [
+        "<node_internals>/**"
+      ]
+    },
+    {
+      "name": "Attach: Next.js Router (9230)",
+      "type": "node",
+      "request": "attach",
       "address": "localhost",
       "port": 9230,
       "restart": true,
-      "sourceMaps": true,
-      "trace": false,
-      // Map host workspace to container working directory
       "localRoot": "${workspaceFolder}",
       "remoteRoot": "/app",
-      // Make stepping smoother through transpiled code
-      "smartStep": true,
-      // Filter noisy internal files
       "skipFiles": [
-        "<node_internals>/**",
-        "**/node_modules/**"
-      ],
-      // Help map sourcemap paths produced by webpack/turbopack to local files
-      "sourceMapPathOverrides": {
-        "/app/*": "${workspaceFolder}/*",
-        "file:///app/*": "${workspaceFolder}/*",
-        // Handle Windows file URLs emitted by Next/Turbopack
-        "file:///E:/Freelance/anigas-attire/*": "${workspaceFolder}/*",
-        "file:///e:/Freelance/anigas-attire/*": "${workspaceFolder}/*",
-        "E:/Freelance/anigas-attire/*": "${workspaceFolder}/*",
-        "e:/Freelance/anigas-attire/*": "${workspaceFolder}/*",
-        "webpack:///./src/*": "${workspaceFolder}/src/*",
-        "webpack:///./*": "${workspaceFolder}/*",
-        "webpack:///src/*": "${workspaceFolder}/src/*",
-        "webpack:///*": "${workspaceFolder}/*",
-        "turbopack://[project]/*": "${workspaceFolder}/*"
-      }
+        "<node_internals>/**"
+      ]
     },
     {
-      "type": "node",
-      "request": "attach",
-      "name": "Attach: Router/Turbopack (Node, 9231)",
-      "address": "localhost",
-      "port": 9231,
-      "restart": true,
-      "sourceMaps": true,
-      "trace": false,
-      "localRoot": "${workspaceFolder}",
-      "remoteRoot": "/app",
-      "smartStep": true,
-      "skipFiles": [
-        "<node_internals>/**",
-        "**/node_modules/**"
-      ],
-      "sourceMapPathOverrides": {
-        "/app/*": "${workspaceFolder}/*",
-        "file:///app/*": "${workspaceFolder}/*",
-        // Virtual proxy modules created by Next/Turbopack -> map back to real source
-        "/app/*/proxy.mjs": "${workspaceFolder}/*",
-        "file:///app/*/proxy.mjs": "${workspaceFolder}/*",
-        "file:///*/proxy.mjs": "${workspaceFolder}/*",
-        "webpack:///*/proxy.mjs": "${workspaceFolder}/*",
-        "turbopack://[project]/*/proxy.mjs": "${workspaceFolder}/*",
-        "file:///E:/Freelance/anigas-attire/*": "${workspaceFolder}/*",
-        "file:///e:/Freelance/anigas-attire/*": "${workspaceFolder}/*",
-        "E:/Freelance/anigas-attire/*": "${workspaceFolder}/*",
-        "e:/Freelance/anigas-attire/*": "${workspaceFolder}/*",
-        "webpack:///./src/*": "${workspaceFolder}/src/*",
-        "webpack:///./*": "${workspaceFolder}/*",
-        "webpack:///src/*": "${workspaceFolder}/src/*",
-        "webpack:///*": "${workspaceFolder}/*",
-        "turbopack://[project]/*": "${workspaceFolder}/*"
-      }
-    },
-    {
-      // Optional: debug client-side code via Edge
+      "name": "Attach: Next.js Client (Edge)",
       "type": "msedge",
       "request": "launch",
-      "name": "Launch Edge: http://localhost:3000",
       "url": "http://localhost:3000",
       "webRoot": "${workspaceFolder}",
       "sourceMapPathOverrides": {
         "/app/*": "${workspaceFolder}/*",
-        "file:///app/*": "${workspaceFolder}/*",
-        // Virtual proxy modules created by Next/Turbopack -> map back to real source
-        "/app/*/proxy.mjs": "${workspaceFolder}/*",
-        "file:///app/*/proxy.mjs": "${workspaceFolder}/*",
-        "file:///*/proxy.mjs": "${workspaceFolder}/*",
-        "webpack:///*/proxy.mjs": "${workspaceFolder}/*",
-        "turbopack://[project]/*/proxy.mjs": "${workspaceFolder}/*",
-        // Windows file URL and path forms
-        "file:///E:/Freelance/anigas-attire/*": "${workspaceFolder}/*",
-        "file:///e:/Freelance/anigas-attire/*": "${workspaceFolder}/*",
-        "E:/Freelance/anigas-attire/*": "${workspaceFolder}/*",
-        "e:/Freelance/anigas-attire/*": "${workspaceFolder}/*",
-        "webpack:///./src/*": "${workspaceFolder}/src/*",
-        "webpack:///./*": "${workspaceFolder}/*",
-        "webpack:///src/*": "${workspaceFolder}/src/*",
-        "webpack:///*": "${workspaceFolder}/*",
-        "turbopack://[project]/*": "${workspaceFolder}/*"
-      }
+        "\\app\\*": "${workspaceFolder}\\*"
+      },
+      "timeout": 60000
     }
   ],
   "compounds": [
     {
-      "name": "Attach All: Next.js (server + router)",
+      "name": "Debug Full Next.js (Server + Router + Client)",
       "configurations": [
-        "Attach: Next.js server (Node, 9230)",
-        "Attach: Router/Turbopack (Node, 9231)",
-        "Launch Edge: http://localhost:3000"
+        "Attach: Next.js Server (9229)",
+        "Attach: Next.js Router (9230)",
+        "Attach: Next.js Client (Edge)"
       ]
     }
   ]

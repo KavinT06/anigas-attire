@@ -1,18 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // Force enable source maps in development
-    // productionBrowserSourceMaps: false,
-    // experimental: {
-    //     serverSourceMaps: true,
-    // },
-    
-    // Ensure proper source map generation
-    // webpack: (config, { dev, isServer }) => {
-    //     if (dev) {
-    //         config.devtool = 'eval-source-map';
-    //     }
-    //     return config;
-    // },
+    reactStrictMode: true,
+    productionBrowserSourceMaps: true, // ✅ allows debugging minified client bundles
+    webpack(config, { dev, isServer }) {
+        if (dev && !isServer) {
+            config.devtool = 'source-map'; // ✅ proper client-side source maps
+        }
+        return config;
+    },
     
     images: {
         remotePatterns: [

@@ -7,19 +7,20 @@ services:
       dockerfile: docker/dev/Dockerfile
     container_name: anigas-attire-frontend-dev
     ports:
-      - "3000:3000"   # Next.js dev server
-      - "9230:9230"   # Node.js debugger (main process)
-      - "9231:9231"   # Next.js router server debugger (Turbopack)
+      - "3000:3000" # Next.js dev server
+      - "9229:9229" # Node.js debugger
+      - "9230:9230" # Next.js router debugger
     env_file:
-      - ../../.env.dev
+      - ../../.env
     environment:
       - NODE_ENV=development
     volumes:
-      # Mount entire project for better source mapping
+      # Mount entire project for live code updates + source maps
       - ../../:/app
-      # Preserve container-specific directories
+      # Preserve container-specific node_modules
       - /app/node_modules
-      - /app/.next
+      # Sync .next folder to inspect generated files locally
+      - ../../.next:/app/.next
     restart: unless-stopped
     networks:
       - anigas-network-dev
@@ -28,18 +29,18 @@ services:
     tty: true
 
   backend:
-    image: infominsolutions/cashya-shoppy:latest
-    pull_policy: missing  # Use local image for faster dev startup
+    image: infominsolutions/cashya-shoppy:latest-dev
+    pull_policy: always
     container_name: anigas-attire-backend-dev
     ports:
-      - "5025:5025"
+      - "8000:8000"
     env_file:
-      - ../../.env.dev
-    environment:
-      - DEBUG=True
+      - ../../.env
     restart: unless-stopped
     networks:
       - anigas-network-dev
+    volumes:
+      - ../../backend-data:/app/data
 
 networks:
   anigas-network-dev:
