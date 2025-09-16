@@ -342,13 +342,12 @@ const Header = () => {
         )}
       </div>
       
-      {/* Overlay for dropdown/mobile menu */}
-      {(showDropdown || showMobileMenu) && (
+      {/* Overlay for dropdown only */}
+      {showDropdown && (
         <div 
           className="fixed inset-0 z-[55]" 
           onClick={() => {
             setShowDropdown(false);
-            setShowMobileMenu(false);
           }}
         />
       )}
