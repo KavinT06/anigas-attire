@@ -3,10 +3,8 @@
  * Centralized endpoint configuration based on Django backend structure
  */
 
-import { env } from 'next-runtime-env';
-
 // Base URL configuration
-export const API_BASE_URL = env('NEXT_PUBLIC_BACKEND_URL') || "http://localhost:5025";
+export const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5025";
 
 // Main API modules
 export const API_MODULES = {
