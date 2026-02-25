@@ -3,7 +3,6 @@ import "./globals.css";
 import Header from '../components/Header';
 import { AuthProvider } from '../contexts/AuthContext';
 import { WishlistProvider } from '../contexts/WishlistContext';
-import { PublicEnvScript } from 'next-runtime-env';
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -26,7 +25,6 @@ export default function RootLayout({ children }) {
             <head>
                 {/* Razorpay SDK for payment integration */}
                 <script src="https://checkout.razorpay.com/v1/checkout.js" async></script>
-                <PublicEnvScript />
             </head>
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
