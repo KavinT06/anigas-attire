@@ -13,6 +13,7 @@ out
 .env.local
 .env.prod
 .env.dev
+!.env.docker.public
 
 # IDE files
 .vscode

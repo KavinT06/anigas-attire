@@ -74,3 +74,4 @@ cleanup.bat
 *.log
 backend-data/
 compose.override.yml
+!.env.docker.public
