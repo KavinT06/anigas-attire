@@ -17,7 +17,9 @@ export default function Hero() {
                                     </div>
                                 </h1>
 
-                                <p className="mt-8 text-base text-black sm:text-xl">Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat.</p>
+                                <p className="mt-8 text-base text-black sm:text-xl">Wear the trend. Own the moment.
+Explore our latest collection of stylish and comfortable apparel.
+Fashion that fits your lifestyle, every single day.</p>
 
                                 <div className="mt-10 sm:flex sm:items-center sm:space-x-8">
                                     <a href="/categories" title="" className="ml-10 xl:ml-0 inline-flex items-center justify-center px-10 py-4 text-base font-semibold text-white transition-all duration-200 bg-orange-500 hover:bg-orange-600 focus:bg-orange-600" role="button"> Shop now </a>

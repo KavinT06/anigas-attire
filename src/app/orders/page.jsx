@@ -102,6 +102,42 @@ const OrdersPage = () => {
         return statusColors[status?.toLowerCase()] || 'bg-gray-100 text-gray-800';
     };
 
+    const getPaymentLabel = (order) => {
+        const orderId = order.id || order.order_id;
+        
+        // First check localStorage cache for payment method
+        if (typeof window !== 'undefined') {
+            const paymentCache = JSON.parse(localStorage.getItem('orderPaymentMethods') || '{}');
+            const cached = paymentCache[orderId];
+            if (cached) {
+                if (cached.includes('cod') || cached.includes('cash')) {
+                    return 'Cash on Delivery';
+                }
+                if (cached.includes('razor')) {
+                    return 'Razorpay';
+                }
+                return cached;
+            }
+        }
+        
+        // Fallback to checking order fields
+        const method = order.payment_method || order.payment || order.gateway || '';
+
+        if (!method) return 'N/A';
+
+        const normalized = String(method).toLowerCase();
+
+        if (normalized.includes('cod') || normalized.includes('cash')) {
+            return 'Cash on Delivery';
+        }
+
+        if (normalized.includes('razor')) {
+            return 'Razorpay';
+        }
+
+        return method;
+    };
+
     const LoadingSkeleton = () => (
         <div className="space-y-4">
             {[1, 2, 3].map((item) => (
@@ -207,9 +243,9 @@ const OrdersPage = () => {
                                                         View Details
                                                     </Link>
                                                 </div>
-                                                {order.payment_method && (
+                                                {getPaymentLabel(order) !== 'N/A' && (
                                                     <p className="text-sm text-gray-600 mt-2">
-                                                        Payment: {order.payment_method}
+                                                        Payment: {getPaymentLabel(order)}
                                                     </p>
                                                 )}
                                             </div>
@@ -260,7 +296,7 @@ const OrdersPage = () => {
                                                         {formatPrice(order.total_amount || order.total)}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                                        {order.payment_method || 'N/A'}
+                                                        {getPaymentLabel(order)}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
                                                         <Link 

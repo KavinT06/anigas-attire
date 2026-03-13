@@ -21,6 +21,7 @@ import {
 } from '../../services/addresses';
 import api from '../../utils/axiosInstance';
 import { ECOM_ENDPOINTS } from '../../utils/apiConfig';
+import { openRazorpayCheckout } from '../../utils/razorpay';
 
 const CheckoutPage = () => {
   const router = useRouter();
@@ -233,6 +234,17 @@ const CheckoutPage = () => {
     }
   };
 
+  const handlePaymentMethodChange = async (method) => {
+    setPaymentMethod(method);
+    try {
+      await api.post(ECOM_ENDPOINTS.payment, {
+        payment_method: method.toLowerCase()
+      });
+    } catch (error) {
+      console.error('Failed to notify payment method selection:', error);
+    }
+  };
+
   const handleDeleteAddress = async (addressId) => {
     if (!confirm('Are you sure you want to delete this address?')) {
       return;
@@ -379,7 +391,7 @@ const CheckoutPage = () => {
       // Step 3: Prepare order payload according to backend requirements
       const orderPayload = {
         address_id: addressId,
-        payment_method: paymentMethod,
+        payment_method: paymentMethod.toLowerCase(),
         ...(couponCode.trim() && { coupon_code: couponCode.trim() }),
         ...(notes.trim() && { notes: notes.trim() })
       };
@@ -389,6 +401,15 @@ const CheckoutPage = () => {
       
       if (orderResult.success) {
         const newOrder = orderResult.data;
+        const orderId = newOrder.id || newOrder.order_id;
+        
+        // Cache payment method in localStorage for orders list to use
+        if (typeof window !== 'undefined') {
+          const paymentCache = JSON.parse(localStorage.getItem('orderPaymentMethods') || '{}');
+          paymentCache[orderId] = paymentMethod.toLowerCase();
+          localStorage.setItem('orderPaymentMethods', JSON.stringify(paymentCache));
+        }
+        
         toast.success('Order placed successfully!');
 
         // Handle payment processing
@@ -400,6 +421,33 @@ const CheckoutPage = () => {
           setTimeout(() => {
             router.push(`/orders/${newOrder.id || newOrder.order_id}`);
           }, 500);
+        } else if (paymentMethod === 'RAZORPAY') {
+          try {
+            const orderId = newOrder.id || newOrder.order_id;
+
+            // PUT to orders/<id>/ to get Razorpay config from backend
+            const configResponse = await api.put(`${ECOM_ENDPOINTS.orders}${orderId}/`);
+            const { config } = configResponse.data;
+
+            await openRazorpayCheckout({
+              ...config,
+              onSuccess: () => {
+                // Payment confirmed by Razorpay, redirect to order page
+                // Backend will verify payment on next order fetch
+                clearCart();
+                window.dispatchEvent(new Event('cartUpdated'));
+                toast.success('Payment successful!');
+                router.push(`/orders/${orderId}?payment=success`);
+              },
+              onDismiss: () => {
+                toast.warning('Payment cancelled. You can retry payment from your order.');
+                router.push(`/orders/${orderId}`);
+              }
+            });
+          } catch (paymentError) {
+            console.error('Razorpay payment error:', paymentError);
+            toast.error(paymentError.message || 'Unable to start Razorpay checkout.');
+          }
         } else {
           // For online payment methods, initiate payment
           try {
@@ -411,37 +459,8 @@ const CheckoutPage = () => {
             if (paymentResult.success) {
               const paymentData = paymentResult.data;
               
-              // Handle different payment gateways
-              if (paymentMethod === 'RAZORPAY' && paymentData.key && paymentData.order_id) {
-                // Initialize Razorpay checkout
-                if (typeof window !== 'undefined' && window.Razorpay) {
-                  const options = {
-                    key: paymentData.key,
-                    amount: paymentData.amount,
-                    currency: paymentData.currency || 'INR',
-                    order_id: paymentData.order_id,
-                    name: 'Anigas Attire',
-                    description: `Order #${newOrder.id || newOrder.order_id}`,
-                    handler: function (response) {
-                      // Payment successful
-                      clearCart();
-                      window.dispatchEvent(new Event('cartUpdated'));
-                      toast.success('Payment successful!');
-                      router.push(`/orders/${newOrder.id || newOrder.order_id}`);
-                    },
-                    modal: {
-                      ondismiss: function () {
-                        toast.warning('Payment cancelled');
-                      }
-                    }
-                  };
-                  
-                  const rzp = new window.Razorpay(options);
-                  rzp.open();
-                } else {
-                  throw new Error('Razorpay not loaded');
-                }
-              } else if (paymentData.payment_url) {
+              // Redirect to payment gateway URL (PhonePe, PayTM, etc.)
+              if (paymentData.payment_url) {
                 // Redirect to payment gateway URL (PhonePe, PayTM, etc.)
                 window.location.href = paymentData.payment_url;
               } else {
@@ -801,9 +820,9 @@ const CheckoutPage = () => {
               <div className="space-y-3">
                 {[
                   { id: 'COD', name: 'Cash on Delivery', desc: 'Pay when you receive your order' },
-                  { id: 'RAZORPAY', name: 'Credit/Debit Card', desc: 'Pay online using Razorpay' },
+                  { id: 'RAZORPAY', name: 'Razorpay', desc: 'Pay using Razorpay' },
+                  { id: 'DEBITCARD', name: 'Credit/Debit Card', desc: 'Pay online using Debit/Credit Card' },
                   { id: 'PHONEPE', name: 'PhonePe', desc: 'Pay using PhonePe wallet' },
-                  { id: 'PAYTM', name: 'Paytm', desc: 'Pay using Paytm wallet' }
                 ].map((method) => (
                   <div key={method.id} className="flex items-start space-x-3">
                     <input
@@ -812,7 +831,7 @@ const CheckoutPage = () => {
                       name="paymentMethod"
                       value={method.id}
                       checked={paymentMethod === method.id}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      onChange={(e) => handlePaymentMethodChange(e.target.value)}
                       className="mt-1 h-4 w-4 text-orange-600 focus:ring-orange-500"
                     />
                     <label htmlFor={method.id} className="flex-1 cursor-pointer">
@@ -893,7 +912,7 @@ const CheckoutPage = () => {
                     Placing Order...
                   </div>
                 ) : (
-                  `Place Order - ${formatPrice(totalPrice)}`
+                  `${paymentMethod === 'RAZORPAY' ? 'Pay Now' : 'Place Order'} - ${formatPrice(totalPrice)}`
                 )}
               </button>
 

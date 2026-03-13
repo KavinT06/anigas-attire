@@ -15,6 +15,7 @@ const OrderDetailsPage = () => {
     const [shippingAddress, setShippingAddress] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [paymentSuccess, setPaymentSuccess] = useState(false);
 
     const orderId = params.id;
 
@@ -67,6 +68,16 @@ const OrderDetailsPage = () => {
         fetchOrderDetails();
     }, [orderId]);
 
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('payment') === 'success') {
+            setPaymentSuccess(true);
+            // Re-fetch after a short delay so the backend-updated payment status is reflected
+            const timer = setTimeout(fetchOrderDetails, 2000);
+            return () => clearTimeout(timer);
+        }
+    }, []);
+
     const formatDate = (dateString) => {
         if (!dateString) return 'N/A';
         try {
@@ -98,6 +109,36 @@ const OrderDetailsPage = () => {
             'refunded': 'bg-gray-100 text-gray-800 border-gray-200'
         };
         return statusColors[status?.toLowerCase()] || 'bg-gray-100 text-gray-800 border-gray-200';
+    };
+
+    const getPaymentLabel = () => {
+        // First check localStorage cache
+        if (typeof window !== 'undefined' && orderId) {
+            const paymentCache = JSON.parse(localStorage.getItem('orderPaymentMethods') || '{}');
+            const cached = paymentCache[orderId];
+            if (cached) {
+                if (cached.includes('cod') || cached.includes('cash')) {
+                    return 'Cash on Delivery';
+                }
+                if (cached.includes('razor')) {
+                    return 'Razorpay';
+                }
+                return cached;
+            }
+        }
+
+        // Fallback to order fields
+        const method = order?.payment_method || order?.payment || order?.gateway || '';
+        if (!method) return null;
+
+        const normalized = String(method).toLowerCase();
+        if (normalized.includes('cod') || normalized.includes('cash')) {
+            return 'Cash on Delivery';
+        }
+        if (normalized.includes('razor')) {
+            return 'Razorpay';
+        }
+        return method;
     };
 
     const LoadingSkeleton = () => (
@@ -206,6 +247,19 @@ const OrderDetailsPage = () => {
         <ProtectedRoute>
             <div className="min-h-screen bg-gray-50 py-4 sm:py-8">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                    {/* Payment Success Banner */}
+                    {paymentSuccess && (
+                        <div className="mb-6 flex items-start gap-3 rounded-lg bg-green-50 border border-green-200 px-4 py-4">
+                            <svg className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <div>
+                                <p className="font-semibold text-green-800">Payment successful!</p>
+                                <p className="text-sm text-green-700">Your payment was received and your order is confirmed.</p>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Back Button */}
                     <div className="mb-6">
                         <Link 
@@ -245,11 +299,11 @@ const OrderDetailsPage = () => {
                                     {formatPrice(order.total_amount || order.total)}
                                 </p>
                             </div>
-                            {order.payment_method && (
+                            {getPaymentLabel() && (
                                 <div>
                                     <p className="text-sm text-gray-600">Payment Method</p>
                                     <p className="text-lg font-semibold text-gray-900">
-                                        {order.payment_method}
+                                        {getPaymentLabel()}
                                     </p>
                                 </div>
                             )}
